@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "name": "tiktok-download",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sqlite3": "^5.1.4"
+  }
+}
