@@ -1,6 +1,9 @@
 import axios from 'axios'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
+import { savePicture } from '../Helper/fsHelper.js'
+
+const downloadPathPrefix = './Download/'
 
 const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
   return await axios.get(userHomeShortUrl)
@@ -74,8 +77,9 @@ const downloadPicture = async (aweme_id) => {
 
   log(`作品${aweme_id}总共有${images.length}张图`);
   images.forEach((imageItem) => {
-    const { url_list } = imageItem
-    log(url_list[3]);
+    const { url_list, uri = "" } = imageItem
+    const fileName = uri.replaceAll('/', '-') + '.jpeg'
+    savePicture(url_list[3], downloadPathPrefix + aweme_id, fileName);
   })
   log(`作品${aweme_id}下载完毕！`);
 }
