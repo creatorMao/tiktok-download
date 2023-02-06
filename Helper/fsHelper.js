@@ -1,38 +1,42 @@
-import fs from 'fs'
+import fs, { existsSync } from 'fs'
 import path from 'path'
-import https from 'https'
+import axios from 'axios'
 import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url) // 这里不能声明__filename,因为已经有内部的__filename了，重复声明会报错
 const _dirname = path.dirname(filename)
 const rootPath = path.join(_dirname, "../")
 
 const createDir = (path) => {
-  fs.exists(path, function (exists) {
-    if (!exists) {
-      fs.mkdirSync(path);
-    }
-  });
+  if (!existsSync(path)) {
+    fs.mkdirSync(path);
+  }
 }
 
-const savePicture = (url, filePath, fileName) => {
-  https.get(url, function (req, res) {
-    let imgData = '';
-    req.on('data', function (chunk) {
-      imgData += chunk;
+const saveFile = async (url, filePath, fileName) => {
+  const filePathAbs = path.join(rootPath, filePath + "/" + fileName)
+
+  if (fs.existsSync(filePathAbs)) {
+    console.log('文件已存在！');
+    return "文件已存在！"
+  }
+  else {
+    createDir(path.join(rootPath, filePath))
+    const writer = fs.createWriteStream(filePathAbs)
+
+    const response = await axios({
+      url,
+      method: 'GET',
+      responseType: 'stream'
     })
-    req.setEncoding('binary');
-    req.on('end', function () {
-      createDir(filePath);
-      const filePathAbs = path.join(rootPath, filePath + "/" + fileName)
-      console.log(filePathAbs);
-      fs.writeFile(filePathAbs, imgData, 'binary', function (err) {
-        console.log(err);
-      })
+    response.data.pipe(writer)
+    return new Promise((resolve, reject) => {
+      writer.on('finish', resolve)
+      writer.on('error', reject)
     })
-  })
+  }
 }
 
 export {
   createDir,
-  savePicture
+  saveFile
 }
