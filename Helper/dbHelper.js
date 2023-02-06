@@ -11,10 +11,10 @@ const initDb = async (dbFilePath, createTableSqlList) => {
   console.log('正在初始化数据库');
   for (let i = 0; i < createTableSqlList.length; i++) {
     let table = createTableSqlList[i];
-    await createTable(db, table.tableCode, table.tableName, table.sql);
+    await createTable(table.tableCode, table.tableName, table.sql);
   }
   console.log('数据库初始化成功');
-
+  currentDb = db
   return db;
 }
 
@@ -24,11 +24,11 @@ const connectDb = (dbFilePath) => {
   return currentDb;
 }
 
-const createTable = async (db, tableCode, tableName, createTableSql) => {
-  const existFlag = await checkTableExist(db, tableCode);
+const createTable = async (tableCode, tableName, createTableSql) => {
+  const existFlag = await checkTableExist(tableCode);
   let tableText = `表【${tableName}:${tableCode}】`
   if (!existFlag) {
-    db.run(createTableSql);
+    currentDb.run(createTableSql);
     console.log(`${tableText}创建成功`);
   }
   else {
@@ -36,15 +36,15 @@ const createTable = async (db, tableCode, tableName, createTableSql) => {
   }
 }
 
-const checkTableExist = async (db, tableName) => {
+const checkTableExist = async (tableName) => {
   const sql = `SELECT count(*) AS COUNT FROM sqlite_master WHERE type = 'table' and tbl_name = '${tableName}'`
-  const rows = await getRowsBySql(db, sql, {});
+  const rows = await getRowsBySql(sql, {});
   return rows[0]["COUNT"] != '0'
 }
 
-const getRowsBySql = (db = currentDb, sql, param) => {
+const getRowsBySql = (sql, param = {}) => {
   return new Promise((resolve, reject) => {
-    db.all(sql, param, function (err, rows) {
+    currentDb.all(sql, param, function (err, rows) {
       if (err) {
         reject(err);
       } else {
@@ -54,13 +54,14 @@ const getRowsBySql = (db = currentDb, sql, param) => {
   });
 }
 
-const runSql = (db = currentDb, sql, param = {}) => {
-  db.run(sql, param, (err) => {
+const runSql = (sql, param = {}) => {
+  currentDb.run(sql, param, (err) => {
     console.log(err);
   });
 }
 
 export {
+  currentDb,
   initDb,
   connectDb,
   createTable,
