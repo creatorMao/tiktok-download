@@ -3,6 +3,7 @@ import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
 import { retryCount } from '../config.js'
+import { calcSecondDifference } from '../Helper/dateHelper.js'
 
 const downloadPathPrefix = './Download/'
 
@@ -22,8 +23,16 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 //        uri       视频资源id
 // max_cursor     
 // 
-const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) => {
+const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status) => {
   const onePageCount = 35; //一页数量
+
+  const downloadStatus = status ? status : {
+    photoCount: 0,
+    videoCount: 0,
+    beginTime: Date.now(),
+    endTime: undefined,
+    downloadTimeCost: 0
+  }
 
   const postVideosApi = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
 
@@ -45,11 +54,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) =>
     switch ((aweme_type + "")) {
       case "68":
         log(`${cursor}页，第${index}个作品是图集，正在处理。`);
-        await downloadPicture(secUserId, aweme_id, path)
+        await downloadPicture(secUserId, aweme_id, path, downloadStatus)
         break;
       case "0":
         log(`${cursor}页，第${index}个作品是视频，正在处理。`);
         await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+        downloadStatus.videoCount++
         break;
     }
   }
@@ -59,7 +69,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) =>
     let count = currentRetryCount + 1
     if (currentRetryCount < retryCount) {
       log(`正在进行第${count}次获取`);
-      downloadUserPost(secUserId, cursor, count);
+      await downloadUserPost(secUserId, cursor, count, downloadStatus);
     }
     else {
       log(`无数据，彻底跳出~`);
@@ -67,9 +77,13 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) =>
   }
   else {
     //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
-    downloadUserPost(secUserId, max_cursor);
+    await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
   }
 
+
+  downloadStatus.endTime = Date.now()
+  downloadStatus.downloadTimeCost = calcSecondDifference(downloadStatus.beginTime, downloadStatus.endTime)
+  return downloadStatus
 }
 
 // aweme_detail   
@@ -80,7 +94,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) =>
 //    author
 //        sec_uid             用户id
 //    desc                    作品内容
-const downloadPicture = async (secUserId, aweme_id, path) => {
+const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
   const api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=${aweme_id}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
 
   // log(api);
@@ -101,6 +115,7 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
     const { url_list, uri = "" } = images[index]
     const fileName = aweme_id + "-" + uri.replaceAll('/', '-') + '.jpeg' //作品id+图片id
     await saveFile(url_list[3], path, fileName);
+    downloadStatus.photoCount++
   }
   log(`作品${aweme_id}下载完毕！`);
 }
