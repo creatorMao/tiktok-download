@@ -2,6 +2,7 @@ import axios from 'axios'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
+import { retryCount } from '../config.js'
 
 const downloadPathPrefix = './Download/'
 
@@ -21,7 +22,7 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 //        uri       视频资源id
 // max_cursor     
 // 
-const downloadUserPost = async (secUserId, cursor = 0) => {
+const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0) => {
   const onePageCount = 35; //一页数量
 
   const postVideosApi = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
@@ -35,10 +36,10 @@ const downloadUserPost = async (secUserId, cursor = 0) => {
     })
 
   const { aweme_list = [], max_cursor = 0 } = postListResRaw || {}
+  const awemeCount = aweme_list.length
+  log(`${cursor}页，获取到${awemeCount}个作品`);
 
-  log(`${cursor}页，获取到${aweme_list.length}个作品`);
-
-  for (let index = 0; index < aweme_list.length; index++) {
+  for (let index = 0; index < awemeCount; index++) {
     const { aweme_type, aweme_id, video = {} } = aweme_list[index]
     const path = downloadPathPrefix + secUserId  //以user_sec_id为文件夹名
     switch ((aweme_type + "")) {
@@ -53,10 +54,22 @@ const downloadUserPost = async (secUserId, cursor = 0) => {
     }
   }
 
-  //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
-  if (max_cursor != 0) {
+  if (awemeCount.length == 0 || max_cursor == 0) {
+    //api不是很稳定，有几率没有成功，所以会多尝试几次
+    let count = currentRetryCount + 1
+    if (currentRetryCount < retryCount) {
+      log(`正在进行第${count}次获取`);
+      downloadUserPost(secUserId, cursor, count);
+    }
+    else {
+      log(`无数据，彻底跳出~`);
+    }
+  }
+  else {
+    //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
     downloadUserPost(secUserId, max_cursor);
   }
+
 }
 
 // aweme_detail   
