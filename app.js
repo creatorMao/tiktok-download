@@ -2,7 +2,7 @@ import express from 'express'
 import { apiPort, dbFilePath } from './config.js'
 import { getParam } from './Helper/httpHelper.js'
 import { addUser } from './Service/user.js'
-import { err } from './Helper/returnHelper.js'
+import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Database/createTable.js'
 import { rootPath } from './Helper/fsHelper.js'
@@ -41,7 +41,9 @@ const initExpress = () => {
       res.send(err('请填写homeShortUrl参数！'));
       return
     }
-    res.send(await addUser(homeShortUrl))
+
+    const { msg } = await addUser(homeShortUrl);
+    res.send(Ok(msg));
   })
 
   app.listen(apiPort, () => {

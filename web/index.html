@@ -69,11 +69,13 @@
         homeShortUrl,
       }
     }).then((res) => {
-      printMessage('添加成功！')
+      const {msg=""}=res.data
+      printMessage(`${msg}`);
     }).catch(res => {
       printMessage('添加失败！')
-      printMessage(`原因:${res.data}`);
-    }).finally(() => {
+      const {msg=""}=res.data
+      printMessage(`${msg}`);
+    }).finally((res) => {
     });
   }
   const filterShortUrl=(text)=>{
