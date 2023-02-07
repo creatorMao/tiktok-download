@@ -6,11 +6,14 @@ const newsCenter = {
   groupId: 'tiktok-download-status',
   url: ''
 }
+const headers = {
+}
 
 export {
   newsCenter,
   homeUrlPrefix,
   retryCount,
   apiPort,
-  dbFilePath
+  dbFilePath,
+  headers
 }

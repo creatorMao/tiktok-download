@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { request } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
@@ -6,9 +6,35 @@ import { retryCount } from '../config.js'
 import { calcSecondDifference } from '../Helper/dateHelper.js'
 
 const downloadPathPrefix = './Download/'
+const aweme = "aweme"
+const video = "video"
+const awemeDetail = "aweme-detail"
+const awemeAvatar = "aweme-avatar"
+const createApi = (type, param) => {
+  let api = "";
+  switch (type) {
+    case aweme:
+      const { secUserId, onePageCount, cursor } = param
+      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      break;
+    case video:
+      const { videoUri } = param
+      api = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${videoUri}&ratio=1080p&line=0`
+      break;
+    case awemeDetail:
+      const { aweme_id } = param
+      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=${aweme_id}`
+      break;
+    case awemeAvatar:
+      const { fileUri } = param
+      api = `https://p3-pc.douyinpic.com/img/aweme-avatar/${fileUri}~c5.jpeg?from=2956013662`
+      break;
+  }
+  return api;
+}
 
 const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
-  return await axios.get(userHomeShortUrl)
+  return await request.get(userHomeShortUrl)
     .then((res) => {
       // console.log(res.request.res.responseUrl);
       return getQueryParamByUrl(res.request.res.responseUrl, "sec_uid")
@@ -24,8 +50,6 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 // max_cursor     
 // 
 const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status) => {
-  const onePageCount = 35; //一页数量
-
   const downloadStatus = status ? status : {
     photoCount: 0,
     videoCount: 0,
@@ -34,9 +58,8 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     downloadTimeCost: 0
   }
 
-  const postVideosApi = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
-
-  const postListResRaw = await axios.get(postVideosApi)
+  const api = createApi(aweme, { secUserId, onePageCount: 35, cursor })
+  const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
     })
@@ -87,12 +110,8 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 }
 
 const getUserInfo = async (secUserId) => {
-  const onePageCount = 1; //一页数量
-  const cursor = 0;
-
-  const postVideosApi = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
-
-  const postListResRaw = await axios.get(postVideosApi)
+  const api = createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
+  const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
     })
@@ -108,11 +127,10 @@ const getUserInfo = async (secUserId) => {
   if (aweme_list.length > 0) {
     nickName = aweme_list[0].author.nickName
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
-    const fileName = fileUri + "~c5.jpeg"
+    const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
-    const userpic = `https://p3-pc.douyinpic.com/img/aweme-avatar/${fileName}?from=2956013662`
-
-    await saveFile(url_list[3], picPath, fileName);
+    const api = createApi(awemeAvatar, { fileUri });
+    await saveFile(api, picPath, fileName);
   }
 
   return {
@@ -132,11 +150,11 @@ const getUserInfo = async (secUserId) => {
 //        sec_uid             用户id
 //    desc                    作品内容
 const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
-  const api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=${aweme_id}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
+  const api = createApi(awemeDetail, { aweme_id })
 
   // log(api);
 
-  const pictureResRaw = await axios.get(api)
+  const pictureResRaw = await request.get(api)
     .then((res) => {
       return res.data
     })
@@ -159,7 +177,7 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
 
 
 const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
-  const api = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${videoUri}&ratio=1080p&line=0`
+  const api = createApi(video, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
   await saveFile(api, path, fileName);
 }

@@ -4,7 +4,7 @@ import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
 import { dbFilePath, newsCenter } from '../config.js'
 import { log } from '../Helper/logHelper.js'
-import axios from 'axios'
+import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
 
 const startTask = async () => {
@@ -46,7 +46,7 @@ const startTask = async () => {
 const sendTaskStatus = async (taskStatus) => {
   const { groupId, url } = newsCenter
   if (url) {
-    axios({
+    request({
       method: 'post',
       url,
       params: {

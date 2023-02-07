@@ -1,3 +1,8 @@
+import axios from 'axios'
+import { headers } from '../config.js'
+console.log(headers);
+const request = axios.create({ headers });
+
 const getParam = (req, key) => {
   let queryRes = "";
   let bodyRes = "";
@@ -14,5 +19,6 @@ const getParam = (req, key) => {
 }
 
 export {
+  request,
   getParam
 }
