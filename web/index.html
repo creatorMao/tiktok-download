@@ -10,6 +10,7 @@
     *{
       margin: 0px;
       padding: 0px;
+      font-size: 16px;
     }
     .container{
       width: 90vw;
@@ -43,6 +44,7 @@
     </div>
     <div class="button">
       <button onclick="add()" id="add">添加到下载队列</button>
+      <button onclick="copyAndAdd()">粘贴，并添加到下载队列</button>
       <button onclick="reset()" id="reset">清空</button>
     </div>
     <div>
@@ -50,6 +52,9 @@
     </div>
     <div>
       日志
+    </div>
+    <div style="margin-top: 10px">
+      <button onclick="resetMessage()">清空</button>
     </div>
     <div>
       <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
@@ -60,7 +65,11 @@
   const add=()=>{
     const homeShortUrl=filterShortUrl(document.querySelector('#text').value);
     
-    console.log(homeShortUrl);
+    if(!homeShortUrl){
+      printMessage('请复制正确的短链！');
+      return
+    }
+
     printMessage(`成功获取解析出短链：${homeShortUrl}，正添加到数据库！`);
     axios({
       method: 'post',
@@ -94,9 +103,23 @@
     document.querySelector('#text').value=""
   }
 
-  const printMessage=(message)=>{
+  const printMessage=(message,clearAll)=>{
     const preValue=document.querySelector('#res').value
-    document.querySelector('#res').value=preValue+message+"\n"
+    if(clearAll){
+      document.querySelector('#res').value=message
+    }
+    else{
+      document.querySelector('#res').value=preValue+message+"\n"
+    }
+  }
+  const copyAndAdd=async ()=>{
+    const clipboard = navigator.clipboard;
+    const text=await clipboard.readText()
+    document.querySelector('#text').value=text
+    add();
+  }
+  const resetMessage=()=>{
+    printMessage("",true);
   }
 </script>
 </html>
