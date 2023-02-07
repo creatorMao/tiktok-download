@@ -4,40 +4,77 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
   <title>Document</title>
   <style>
     *{
       margin: 0px;
       padding: 0px;
     }
+    .container{
+      width: 90vw;
+      margin-left: 5vw;
+    }
     #text{
       width: 90vw;
       height: 10vh;
       margin-top: 10px;
     }
-    .center{
-      display: flex;
-      justify-content: center;
-    }
     #add{
-      margin-left: 5vw;
       margin-top: 10px;
+    }
+    #res{
+      width: 90vw;
+      height: 50vh;
+      margin-top: 10px;
+    }
+    .button{
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="center">
-    <textarea id="text" name="" id="" cols="30" rows="10"></textarea>
-  </div>
-  <div>
-    <button onclick="add()" id="add">添加到下载队列</button>
-    <button onclick="reset()" id="reset">清空</button>
+  <div class="container">
+    <div>
+      请复制用户主页短链接到此输入框：
+    </div>
+    <div>
+      <textarea id="text" name="" id="" cols="30" rows="10"></textarea>
+    </div>
+    <div class="button">
+      <button onclick="add()" id="add">添加到下载队列</button>
+      <button onclick="reset()" id="reset">清空</button>
+    </div>
+    <div>
+      ---------------------------------
+    </div>
+    <div>
+      日志
+    </div>
+    <div>
+      <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
+    </div>
   </div>
 </body>
 <script>
   const add=()=>{
-    const shortUrl=filterShortUrl(document.querySelector('#text').value);
-    console.log(shortUrl);
+    const homeShortUrl=filterShortUrl(document.querySelector('#text').value);
+    
+    console.log(homeShortUrl);
+    printMessage(`成功获取解析出短链：${homeShortUrl}，正添加到数据库！`);
+    axios({
+      method: 'post',
+      url:'/user/add',
+      params: {
+        homeShortUrl,
+      }
+    }).then((res) => {
+      printMessage('添加成功！')
+    }).catch(res => {
+      printMessage('添加失败！')
+      printMessage(`原因:${res.data}`);
+    }).finally(() => {
+    });
   }
   const filterShortUrl=(text)=>{
     try{
@@ -53,6 +90,11 @@
     }
   const reset=()=>{
     document.querySelector('#text').value=""
+  }
+
+  const printMessage=(message)=>{
+    const preValue=document.querySelector('#res').value
+    document.querySelector('#res').value=preValue+message+"\n"
   }
 </script>
 </html>
