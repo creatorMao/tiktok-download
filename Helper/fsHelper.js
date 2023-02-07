@@ -37,6 +37,7 @@ const saveFile = async (url, filePath, fileName) => {
 }
 
 export {
+  rootPath,
   createDir,
   saveFile
 }

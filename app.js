@@ -5,6 +5,8 @@ import { addUser } from './Service/user.js'
 import { err } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Database/createTable.js'
+import { rootPath } from './Helper/fsHelper.js'
+import path from 'path'
 
 const initExpress = () => {
   const app = express()
@@ -27,6 +29,10 @@ const initExpress = () => {
       'Origin, X-Requested-With, Content-Type, Accept, If-Modified-Since'
     )
     next()
+  })
+
+  app.all('/', async function (req, res) {
+    res.sendFile(path.join(rootPath, './web/index.html'))
   })
 
   app.all('/user/add', async function (req, res) {

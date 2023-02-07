@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      margin: 0px;
+      padding: 0px;
+    }
+    #text{
+      width: 90vw;
+      height: 10vh;
+      margin-top: 10px;
+    }
+    .center{
+      display: flex;
+      justify-content: center;
+    }
+    #add{
+      margin-left: 5vw;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <textarea id="text" name="" id="" cols="30" rows="10"></textarea>
+  </div>
+  <div>
+    <button onclick="add()" id="add">添加到下载队列</button>
+    <button onclick="reset()" id="reset">清空</button>
+  </div>
+</body>
+<script>
+  const add=()=>{
+    const shortUrl=filterShortUrl(document.querySelector('#text').value);
+    console.log(shortUrl);
+  }
+  const filterShortUrl=(text)=>{
+    try{
+      if(text)
+      {
+        return text.match(new RegExp(/((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g))[0];
+      }
+    }
+    catch{
+
+    }
+      return ""
+    }
+  const reset=()=>{
+    document.querySelector('#text').value=""
+  }
+</script>
+</html>
