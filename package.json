@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
-    "task": "node startTask.js",
+    "task": "node task.js",
     "test": "node test.js"
   },
   "author": "",

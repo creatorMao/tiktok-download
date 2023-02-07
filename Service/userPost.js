@@ -2,7 +2,7 @@ import { request } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
-import { retryCount } from '../config.js'
+import { retryCount } from '../Config/config.js'
 import { calcSecondDifference } from '../Helper/dateHelper.js'
 
 const downloadPathPrefix = './Download/'

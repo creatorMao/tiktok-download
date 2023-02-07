@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { headers } from '../config.js'
+import { headers } from '../Config/config.js'
 const request = axios.create({ headers });
 
 const getParam = (req, key) => {

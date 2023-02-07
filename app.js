@@ -1,10 +1,10 @@
 import express from 'express'
-import { apiPort, dbFilePath } from './config.js'
+import { apiPort, dbFilePath } from './Config/config.js'
 import { getParam } from './Helper/httpHelper.js'
 import { addUser } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
-import { createTableSqlList } from './Database/createTable.js'
+import { createTableSqlList } from './Config/createTable.js'
 import { rootPath } from './Helper/fsHelper.js'
 import path from 'path'
 
