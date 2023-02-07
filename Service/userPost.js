@@ -13,19 +13,19 @@ const awemeAvatar = "aweme-avatar"
 const createApi = (type, param) => {
   let api = "";
   switch (type) {
-    case aweme:
+    case aweme: //作品集
       const { secUserId, onePageCount, cursor } = param
       api = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
       break;
-    case video:
+    case video: //视频
       const { videoUri } = param
       api = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${videoUri}&ratio=1080p&line=0`
       break;
-    case awemeDetail:
+    case awemeDetail://作品详情
       const { aweme_id } = param
       api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=${aweme_id}`
       break;
-    case awemeAvatar:
+    case awemeAvatar://作者头像
       const { fileUri } = param
       api = `https://p3-pc.douyinpic.com/img/aweme-avatar/${fileUri}~c5.jpeg?from=2956013662`
       break;
