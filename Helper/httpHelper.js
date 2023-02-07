@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { headers } from '../config.js'
-console.log(headers);
 const request = axios.create({ headers });
 
 const getParam = (req, key) => {
