@@ -86,6 +86,43 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   return downloadStatus
 }
 
+const getUserInfo = async (secUserId) => {
+  const onePageCount = 1; //一页数量
+  const cursor = 0;
+
+  const postVideosApi = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}&aid=1128&version_name=23.5.0&device_platform=android&os_version=2333`
+
+  const postListResRaw = await axios.get(postVideosApi)
+    .then((res) => {
+      return res.data
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+
+  const { aweme_list = [] } = postListResRaw || {}
+  const nickName = "";
+  const picPath = downloadPathPrefix + secUserId  //以user_sec_id为文件夹名
+  const picPathFull = ""
+
+  if (aweme_list.length > 0) {
+    nickName = aweme_list[0].author.nickName
+    const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
+    const fileName = fileUri + "~c5.jpeg"
+    picPathFull = picPath + "/" + fileName
+    const userpic = `https://p3-pc.douyinpic.com/img/aweme-avatar/${fileName}?from=2956013662`
+
+    await saveFile(url_list[3], picPath, fileName);
+  }
+
+  return {
+    secUserId,
+    nickName,
+    picPath,
+    picPathFull
+  }
+}
+
 // aweme_detail   
 //    images                  一个作品里图片有很多张
 //        download_url_list   有水印，
@@ -129,5 +166,6 @@ const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
 
 export {
   getSecUserIdFromShortUrl,
-  downloadUserPost
+  downloadUserPost,
+  getUserInfo
 }
