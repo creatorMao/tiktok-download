@@ -8,7 +8,16 @@ const getNowDate = (format = 'YYYY-MM-DD HH:mm:ss') => {
   return dayjs().format(format)
 }
 
+const delay = async (timeout) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  })
+}
+
 export {
+  delay,
   calcSecondDifference,
   getNowDate
 }

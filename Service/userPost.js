@@ -2,8 +2,8 @@ import { request } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
-import { retryCount } from '../Config/config.js'
-import { calcSecondDifference } from '../Helper/dateHelper.js'
+import { retryCount, delayTimeOut } from '../Config/config.js'
+import { calcSecondDifference, delay } from '../Helper/dateHelper.js'
 import { getXg } from './xg.js'
 import { dataPath } from '../Config/config.js'
 import { downloadTypeOfAll, downloadTypeOfUpdate } from './const.js'
@@ -87,10 +87,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     switch ((aweme_type + "")) {
       case "68":
         log(`${cursor}页，第${index + 1}个作品是图集，正在处理。`);
+        await delay(delayTimeOut)
         await downloadPicture(secUserId, aweme_id, path, downloadStatus)
         break;
       case "0":
         log(`${cursor}页，第${index}个作品是视频，正在处理。`);
+        await delay(delayTimeOut)
         await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path, downloadStatus);
         break;
     }
@@ -101,6 +103,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     let count = currentRetryCount + 1
     if (currentRetryCount < retryCount) {
       log(`正在进行第${count}次获取`);
+      await delay(delayTimeOut)
       return await downloadUserPost(secUserId, cursor, count, downloadStatus);
     }
     else {
@@ -112,6 +115,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     //全量更新，才需要翻页，增量更新，第一页检查一下有没有漏，不会再查询第二页。
     if (downloadType == downloadTypeOfAll) {
       //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
+      await delay(delayTimeOut)
       return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
     }
   }
