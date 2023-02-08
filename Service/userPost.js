@@ -99,7 +99,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     let count = currentRetryCount + 1
     if (currentRetryCount < retryCount) {
       log(`正在进行第${count}次获取`);
-      await downloadUserPost(secUserId, cursor, count, downloadStatus);
+      return await downloadUserPost(secUserId, cursor, count, downloadStatus);
     }
     else {
       log(`无数据，彻底跳出~`);
@@ -107,7 +107,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   }
   else {
     //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
-    await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
+    return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
   }
 
 
