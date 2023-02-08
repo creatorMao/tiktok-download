@@ -89,8 +89,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         break;
       case "0":
         log(`${cursor}页，第${index}个作品是视频，正在处理。`);
-        await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
-        downloadStatus.videoCount++
+        await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path, downloadStatus);
         break;
     }
   }
@@ -176,17 +175,22 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
   for (let index = 0; index < images.length; index++) {
     const { url_list, uri = "" } = images[index]
     const fileName = aweme_id + "-" + uri.replaceAll('/', '-') + '.jpeg' //作品id+图片id
-    await saveFile(url_list[3], path, fileName);
-    downloadStatus.photoCount++
+    const { downloadSuccessFlag } = await saveFile(url_list[3], path, fileName);
+    if (downloadSuccessFlag) {
+      downloadStatus.photoCount++
+    }
   }
   log(`作品${aweme_id}下载完毕！`);
 }
 
 
-const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
+const downloadVideo = async (secUserId, aweme_id, videoUri, path, downloadStatus) => {
   const api = createApi(video, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
-  await saveFile(api, path, fileName);
+  const { downloadSuccessFlag } = await saveFile(api, path, fileName);
+  if (downloadSuccessFlag) {
+    downloadStatus.videoCount++
+  }
 }
 
 export {

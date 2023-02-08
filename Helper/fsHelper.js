@@ -35,7 +35,6 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
   if (fs.existsSync(filePathAbs)) {
     res.msg = "文件已存在！"
     res.existFlag = true
-    res.downloadSuccessFlag = true
     return res
   }
   else {
@@ -53,7 +52,6 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       return new Promise((resolve, reject) => {
         writer.on('finish', () => {
           res.msg = "文件下载成功！"
-          res.existFlag = false
           res.downloadSuccessFlag = true
           resolve(res);
         })
@@ -70,8 +68,6 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
           }
           else {
             res.msg = "文件下载失败！"
-            res.existFlag = false
-            res.downloadSuccessFlag = false
             resolve(res);
           }
         })
@@ -89,8 +85,6 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       }
       else {
         res.msg = err.message
-        res.existFlag = false
-        res.downloadSuccessFlag = false
         return res
       }
     }
