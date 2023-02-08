@@ -5,20 +5,20 @@ import { saveFile } from '../Helper/fsHelper.js'
 import { retryCount } from '../Config/config.js'
 import { calcSecondDifference } from '../Helper/dateHelper.js'
 import { getXg } from './xg.js'
+import { dataPath } from '../Config/config.js'
 
-const downloadPathPrefix = './Download/'
 const aweme = "aweme"
 const video = "video"
 const awemeDetail = "aweme-detail"
 const awemeAvatar = "aweme-avatar"
 const createApi = (type, param) => {
   let api = "";
+  let paramText = "";
   switch (type) {
     case aweme: //作品集
       const { secUserId, onePageCount, cursor } = param
-      const paramText = `sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
-      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?${paramText}&X-Bogus=${getXg(paramText)}`
-      log(api)
+      paramText = `aid=6383&sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      api = `https://www.douyin.com/aweme/v1/web/aweme/post/?${paramText}`
       break;
     case video: //视频
       const { videoUri } = param
@@ -26,13 +26,18 @@ const createApi = (type, param) => {
       break;
     case awemeDetail://作品详情
       const { aweme_id } = param
-      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?aweme_id=${aweme_id}`
+      paramText = `aid=6383&aweme_id=${aweme_id}`
+      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?${paramText}`
       break;
     case awemeAvatar://作者头像
       const { fileUri } = param
       api = `https://p3-pc.douyinpic.com/img/aweme-avatar/${fileUri}~c5.jpeg?from=2956013662`
       break;
   }
+
+  //加密参数
+  api = `${api}&X-Bogus=${getXg(paramText)}`
+
   return api;
 }
 
@@ -61,7 +66,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     downloadTimeCost: 0
   }
 
-  const api = createApi(aweme, { secUserId, onePageCount: 35, cursor })
+  const api = createApi(aweme, { secUserId, onePageCount: 30, cursor })
   const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
@@ -76,7 +81,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 
   for (let index = 0; index < awemeCount; index++) {
     const { aweme_type, aweme_id, video = {} } = aweme_list[index]
-    const path = downloadPathPrefix + secUserId  //以user_sec_id为文件夹名
+    const path = dataPath + secUserId  //以user_sec_id为文件夹名
     switch ((aweme_type + "")) {
       case "68":
         log(`${cursor}页，第${index}个作品是图集，正在处理。`);
@@ -123,9 +128,9 @@ const getUserInfo = async (secUserId) => {
     })
 
   const { aweme_list = [] } = postListResRaw || {}
-  const nickName = "";
-  const picPath = downloadPathPrefix + secUserId  //以user_sec_id为文件夹名
-  const picPathFull = ""
+  let nickName = "";
+  const picPath = dataPath + secUserId  //以user_sec_id为文件夹名
+  let picPathFull = ""
 
   if (aweme_list.length > 0) {
     nickName = aweme_list[0].author.nickName
@@ -164,7 +169,6 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
     .catch((err) => {
       console.log(err);
     })
-
   const { images } = pictureResRaw.aweme_detail
 
   log(`作品${aweme_id}总共有${images.length}张图`);
