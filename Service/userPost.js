@@ -6,6 +6,7 @@ import { retryCount } from '../Config/config.js'
 import { calcSecondDifference } from '../Helper/dateHelper.js'
 import { getXg } from './xg.js'
 import { dataPath } from '../Config/config.js'
+import { downloadTypeOfAll, downloadTypeOfUpdate } from './const.js'
 
 const aweme = "aweme"
 const video = "video"
@@ -55,9 +56,10 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 //    video 
 //      play_addr
 //        uri       视频资源id
+//    desc          内容
 // max_cursor     
 // 
-const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status) => {
+const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status, downloadType = downloadTypeOfAll) => {
   const downloadStatus = status ? status : {
     photoCount: 0,
     videoCount: 0,
@@ -84,7 +86,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     const path = dataPath + secUserId  //以user_sec_id为文件夹名
     switch ((aweme_type + "")) {
       case "68":
-        log(`${cursor}页，第${index}个作品是图集，正在处理。`);
+        log(`${cursor}页，第${index + 1}个作品是图集，正在处理。`);
         await downloadPicture(secUserId, aweme_id, path, downloadStatus)
         break;
       case "0":
@@ -106,8 +108,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     }
   }
   else {
-    //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
-    return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
+
+    //全量更新，才需要翻页，增量更新，第一页检查一下有没有漏，不会再查询第二页。
+    if (downloadType == downloadTypeOfAll) {
+      //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
+      return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
+    }
   }
 
 
@@ -175,9 +181,13 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
   for (let index = 0; index < images.length; index++) {
     const { url_list, uri = "" } = images[index]
     const fileName = aweme_id + "-" + uri.replaceAll('/', '-') + '.jpeg' //作品id+图片id
-    const { downloadSuccessFlag } = await saveFile(url_list[3], path, fileName);
+    const { downloadSuccessFlag, existFlag, msg } = await saveFile(url_list[3], path, fileName);
     if (downloadSuccessFlag) {
+      log(`图${index + 1},${msg}`)
       downloadStatus.photoCount++
+    }
+    else {
+      log(`图${index + 1},${msg}`)
     }
   }
   log(`作品${aweme_id}下载完毕！`);
@@ -187,9 +197,13 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
 const downloadVideo = async (secUserId, aweme_id, videoUri, path, downloadStatus) => {
   const api = createApi(video, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
-  const { downloadSuccessFlag } = await saveFile(api, path, fileName);
+  const { downloadSuccessFlag, existFlag, msg } = await saveFile(api, path, fileName);
   if (downloadSuccessFlag) {
+    log(`视频,${msg}`)
     downloadStatus.videoCount++
+  }
+  else {
+    log(`视频,${msg}`)
   }
 }
 

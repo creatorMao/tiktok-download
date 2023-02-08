@@ -6,6 +6,7 @@ import { dbFilePath, newsCenter } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
+import { downloadTypeOfUpdate } from './const.js'
 
 const startTask = async () => {
   await initDb(dbFilePath, createTableSqlList);
@@ -23,15 +24,19 @@ const startTask = async () => {
     PROGRESS: 0
   }
 
+  log(`本次增量更新，预计将更新${total}个用户~`);
   for (let index = 0; index < total; index++) {
+    const nickName = userList[index]["NICK_NAME"]
+    log(`正在更新第${index + 1}个用户,用户名:【${nickName}】`)
     const user = userList[index]
 
     if (user.DOWNLOAD_FLAG == '0') {
+      log(`该用户设置了不更新，将跳过~`)
       continue
     }
 
-    const status = await downloadUserPost(user['SEC_USER_ID']);
-
+    const status = await downloadUserPost(user['SEC_USER_ID'], undefined, undefined, undefined, downloadTypeOfUpdate);//增量更新
+    log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，耗时${status.downloadTimeCost}秒~`)
     taskStatus.PHOTO_COUNT += status.photoCount
     taskStatus.VIDEO_COUNT += status.videoCount
     taskStatus.DOWNLOAD_TIME_COST += status.downloadTimeCost
@@ -40,6 +45,8 @@ const startTask = async () => {
     taskStatus.PROGRESS = ((index + 1) / total).toFixed(2)
     await sendTaskStatus({ ...taskStatus });
   }
+
+  log(`本次增量更新更新完毕，下载了${taskStatus.VIDEO_COUNT}个视频,${taskStatus.PHOTO_COUNT}张图片，耗时${taskStatus.DOWNLOAD_TIME_COST}秒~`);
 }
 
 
