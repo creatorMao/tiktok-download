@@ -44,7 +44,7 @@
     </div>
     <div class="button">
       <button onclick="add()" id="add">添加到下载队列</button>
-      <button onclick="copyAndAdd()">粘贴，并添加到下载队列</button>
+      <button onclick="copyAndAdd()">粘贴，并添加到下载队列(不支持safari)</button>
       <button onclick="reset()" id="reset">清空</button>
     </div>
     <div>
@@ -114,9 +114,15 @@
   }
   const copyAndAdd=async ()=>{
     const clipboard = navigator.clipboard;
-    const text=await clipboard.readText()
-    document.querySelector('#text').value=text
-    add();
+    if(clipboard){
+      const text=await clipboard.readText()
+      document.querySelector('#text').value=text
+      add();
+    }
+    else{
+      document.getElementById('text').select();
+      document.execCommand('paste')
+    }
   }
   const resetMessage=()=>{
     printMessage("",true);
