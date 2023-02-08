@@ -133,7 +133,7 @@ const getUserInfo = async (secUserId) => {
   let picPathFull = ""
 
   if (aweme_list.length > 0) {
-    nickName = aweme_list[0].author.nickName
+    nickName = aweme_list[0].author.nickname
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
     const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
