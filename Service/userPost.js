@@ -4,6 +4,7 @@ import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
 import { retryCount } from '../Config/config.js'
 import { calcSecondDifference } from '../Helper/dateHelper.js'
+import { getXg } from './xg.js'
 
 const downloadPathPrefix = './Download/'
 const aweme = "aweme"
@@ -15,7 +16,9 @@ const createApi = (type, param) => {
   switch (type) {
     case aweme: //作品集
       const { secUserId, onePageCount, cursor } = param
-      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      const paramText = `sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/post/?${paramText}&X-Bogus=${getXg(paramText)}`
+      log(api)
       break;
     case video: //视频
       const { videoUri } = param
