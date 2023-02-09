@@ -2,11 +2,10 @@ import { initDb } from '../Helper/dbHelper.js'
 import { createTableSqlList } from '../Config/createTable.js'
 import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
-import { dbFilePath, newsCenter } from '../Config/config.js'
+import { dbFilePath, newsCenter, downloadType } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
-import { downloadTypeOfUpdate, downloadTypeOfAll } from './const.js'
 
 const startTask = async () => {
   await initDb(dbFilePath, createTableSqlList);
@@ -35,7 +34,7 @@ const startTask = async () => {
       continue
     }
 
-    const status = await downloadUserPost(user['SEC_USER_ID'], undefined, undefined, undefined, downloadTypeOfUpdate);//增量更新
+    const status = await downloadUserPost(user['SEC_USER_ID'], undefined, undefined, undefined, downloadType);//增量更新
     log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，耗时${status.downloadTimeCost}秒~`)
     taskStatus.PHOTO_COUNT += status.photoCount
     taskStatus.VIDEO_COUNT += status.videoCount

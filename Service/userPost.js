@@ -18,6 +18,7 @@ import {
 import { addAweme } from './aweme.js'
 
 const createApi = async (type, param) => {
+  await delay(delayTimeOut)
   let api = "";
   let paramText = "";
   let xg = ""
@@ -181,7 +182,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 }
 
 const getUserInfo = async (secUserId) => {
-  const { api } = createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
+  const { api } = await createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
   const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
@@ -200,7 +201,7 @@ const getUserInfo = async (secUserId) => {
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
     const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
-    const { api } = createApi(awemeAvatar, { fileUri });
+    const { api } = await createApi(awemeAvatar, { fileUri });
     await saveFile(api, picPath, fileName);
   }
 
@@ -221,7 +222,7 @@ const getUserInfo = async (secUserId) => {
 //        sec_uid             用户id
 //    desc                    作品内容
 const downloadPicture = async (secUserId, aweme_id, path) => {
-  const { api } = createApi(awemeDetail, { aweme_id })
+  const { api } = await createApi(awemeDetail, { aweme_id })
 
   // log(api);
 
@@ -247,7 +248,7 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
 
 
 const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
-  const { api } = createApi(videoType, { videoUri });
+  const { api } = await createApi(videoType, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
   return [{ ...await saveFile(api, path, fileName) }];
 }

@@ -1,9 +1,10 @@
+import { generateRandomStr } from '../Helper/generatorHelper.js'
+import { downloadTypeOfUpdate, downloadTypeOfAll } from '../Service/const.js'
+const downloadType = downloadTypeOfUpdate
 const homeUrlPrefix = "https://www.douyin.com/user/"
 const retryCount = 3 //重试次数
 const apiPort = 3000
 const dataPath = './Data/' //数据目录
-import { generateRandomStr } from '../Helper/generatorHelper.js'
-
 const dbFilePath = dataPath + 'basedb.db' //数据库文件
 const logFilePath = dataPath + 'Log/'//日志文件夹
 const newsCenter = {
@@ -20,6 +21,7 @@ const headers = {
 const delayTimeOut = 1000
 
 export {
+  downloadType,
   delayTimeOut,
   newsCenter,
   homeUrlPrefix,

@@ -12,7 +12,7 @@ const getNowDate = (format = 'YYYY-MM-DD HH:mm:ss') => {
 const delay = async (timeout) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      log(`延迟${timeout}秒~`)
+      log(`延迟${(timeout / 1000).toFixed(1)}秒~`)
       resolve();
     }, timeout);
   })
