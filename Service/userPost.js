@@ -50,7 +50,7 @@ const createApi = (type, param) => {
 const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
   return await request.get(userHomeShortUrl)
     .then((res) => {
-      // console.log(res.request.res.responseUrl);
+      // log(res.request.res.responseUrl);
       return getQueryParamByUrl(res.request.res.responseUrl, "sec_uid")
     });
 }
@@ -80,7 +80,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       return res.data
     })
     .catch((err) => {
-      console.log(err);
+      log(err);
     })
 
   const { aweme_list = [], max_cursor = 0 } = postListResRaw || {}
@@ -107,7 +107,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     }
 
     //保存作品信息
-    // console.log(downloadRes);
+    // log(downloadRes);
     for (let j = 0; j < downloadRes.length; j++) {
       let { fileUrl, msg, downloadSuccessFlag } = downloadRes[j]
 
@@ -176,7 +176,7 @@ const getUserInfo = async (secUserId) => {
       return res.data
     })
     .catch((err) => {
-      console.log(err);
+      log(err);
     })
 
   const { aweme_list = [] } = postListResRaw || {}
@@ -221,7 +221,7 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
       return res.data
     })
     .catch((err) => {
-      console.log(err);
+      log(err);
     })
   const { images } = pictureResRaw.aweme_detail
 

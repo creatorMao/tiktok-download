@@ -6,7 +6,7 @@ import { dbFilePath, newsCenter } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
-import { downloadTypeOfUpdate } from './const.js'
+import { downloadTypeOfUpdate, downloadTypeOfAll } from './const.js'
 
 const startTask = async () => {
   await initDb(dbFilePath, createTableSqlList);
@@ -61,9 +61,9 @@ const sendTaskStatus = async (taskStatus) => {
         content: JSON.stringify(taskStatus)
       }
     }).then((res) => {
-      console.log('下载状态发送成功！');
+      log('下载状态发送成功！');
     }).catch(res => {
-      console.log('下载状态发送失败');
+      log('下载状态发送失败');
     }).finally(() => {
     });
   }

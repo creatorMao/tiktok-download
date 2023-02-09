@@ -3,6 +3,7 @@ import path from 'path'
 import axios from 'axios'
 import { retryCount } from '../Config/config.js'
 import { fileURLToPath } from 'url'
+import { log } from './logHelper.js'
 const filename = fileURLToPath(import.meta.url) // 这里不能声明__filename,因为已经有内部的__filename了，重复声明会报错
 const _dirname = path.dirname(filename)
 const rootPath = path.join(_dirname, "../")
@@ -10,6 +11,14 @@ const rootPath = path.join(_dirname, "../")
 const createDir = (path) => {
   if (!existsSync(path)) {
     fs.mkdirSync(path);
+    return {
+      existFlag: false
+    }
+  }
+  else {
+    return {
+      existFlag: true
+    }
   }
 }
 
@@ -65,7 +74,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
           }
 
           if (retryFlag && currentRetryCount < retryCountTotal) {
-            console.log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 1}次尝试！`);
+            log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 1}次尝试！`);
             resolve(await saveFile(url, filePath, fileName, true, undefined, currentRetryCount + 1));
           }
           else {
@@ -82,7 +91,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
         deleteFile(fileUrlAbs);
       }
       if (retryFlag && currentRetryCount < retryCountTotal) {
-        console.log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 2}次尝试！`);
+        log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 2}次尝试！`);
         return await saveFile(url, filePath, fileName, true, retryCountTotal, currentRetryCount + 1);
       }
       else {

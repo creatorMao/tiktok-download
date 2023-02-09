@@ -1,19 +1,20 @@
 import sqlite3 from 'sqlite3'
+import { log } from './logHelper.js'
 
 let currentDb = null;
 
 const initDb = async (dbFilePath, createTableSqlList) => {
 
-  console.log('正在连接数据库');
+  log('正在连接数据库');
   const db = connectDb(dbFilePath);
-  console.log('数据库连接成功');
+  log('数据库连接成功');
 
-  console.log('正在初始化数据库');
+  log('正在初始化数据库');
   for (let i = 0; i < createTableSqlList.length; i++) {
     let table = createTableSqlList[i];
     await createTable(table.tableCode, table.tableName, table.sql);
   }
-  console.log('数据库初始化成功');
+  log('数据库初始化成功');
   currentDb = db
   return db;
 }
@@ -29,10 +30,10 @@ const createTable = async (tableCode, tableName, createTableSql) => {
   let tableText = `表【${tableName}:${tableCode}】`
   if (!existFlag) {
     currentDb.run(createTableSql);
-    console.log(`${tableText}创建成功`);
+    log(`${tableText}创建成功`);
   }
   else {
-    console.log(`${tableText}已存在，将跳过`);
+    log(`${tableText}已存在，将跳过`);
   }
 }
 

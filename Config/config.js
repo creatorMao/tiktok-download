@@ -2,7 +2,8 @@ const homeUrlPrefix = "https://www.douyin.com/user/"
 const retryCount = 3 //重试次数
 const apiPort = 3000
 const dataPath = './Data/' //数据目录
-const dbFilePath = dataPath + 'basedb.db'
+const dbFilePath = dataPath + 'basedb.db' //数据库文件
+const logFilePath = dataPath + 'Log/'//日志文件夹
 const newsCenter = {
   groupId: 'tiktok-download-status',
   url: ''
@@ -21,5 +22,6 @@ export {
   apiPort,
   dbFilePath,
   headers,
-  dataPath
+  dataPath,
+  logFilePath
 }

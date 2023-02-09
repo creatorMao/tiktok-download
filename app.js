@@ -7,6 +7,7 @@ import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Config/createTable.js'
 import { rootPath } from './Helper/fsHelper.js'
 import path from 'path'
+import { log } from './Helper/logHelper.js'
 
 const initExpress = () => {
   const app = express()
@@ -47,7 +48,7 @@ const initExpress = () => {
   })
 
   app.listen(apiPort, () => {
-    console.log(`程序已启动，请访问http://localhost:${apiPort}/`)
+    log(`程序已启动，请访问http://localhost:${apiPort}/`)
   })
 }
 
