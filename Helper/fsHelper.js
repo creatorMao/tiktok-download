@@ -85,11 +85,19 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       })
     }
     catch (err) {
-      if (writer) {
-        writer.end();
-        writer.destroy();
+      try {
+        if (writer) {
+          writer.end();
+          writer.destroy();
+          deleteFile(fileUrlAbs);
+        }
+
         deleteFile(fileUrlAbs);
       }
+      catch {
+
+      }
+
       if (retryFlag && currentRetryCount < retryCountTotal) {
         log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 2}次尝试！`);
         return await saveFile(url, filePath, fileName, true, retryCountTotal, currentRetryCount + 1);
