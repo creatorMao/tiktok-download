@@ -20,22 +20,27 @@
 // console.log(1);
 
 
-import { addAweme } from './Service/aweme.js'
-import { dbFilePath } from './Config/config.js'
-import { createTableSqlList } from './Config/createTable.js'
-import { initDb } from './Helper/dbHelper.js'
-const init = async () => {
-  await initDb(dbFilePath, createTableSqlList);
-}
-await init()
+// import { addAweme } from './Service/aweme.js'
+// import { dbFilePath } from './Config/config.js'
+// import { createTableSqlList } from './Config/createTable.js'
+// import { initDb } from './Helper/dbHelper.js'
+// const init = async () => {
+//   await initDb(dbFilePath, createTableSqlList);
+// }
+// await init()
 
-console.log(1);
-const addRes = await addAweme({
-  'secUserId': 'secUserId',
-  'awemeId': 'awemeId',
-  'awemeType': 'awemeType',
-  'desc': 'desc',
-  'awemeFileUrl': 'awemeFileUrl'
-})
-console.log(addRes);
-console.log(2)
+// console.log(1);
+// const addRes = await addAweme({
+//   'secUserId': 'secUserId',
+//   'awemeId': 'awemeId',
+//   'awemeType': 'awemeType',
+//   'desc': 'desc',
+//   'awemeFileUrl': 'awemeFileUrl'
+// })
+// console.log(addRes);
+// console.log(2)
+
+import { generateRandomStr } from './Helper/generatorHelper.js'
+import { headers } from './Config/config.js'
+console.log(headers)
+console.log(headers)

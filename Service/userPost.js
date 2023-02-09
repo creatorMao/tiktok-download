@@ -17,14 +17,17 @@ import {
 } from './const.js'
 import { addAweme } from './aweme.js'
 
-const createApi = (type, param) => {
+const createApi = async (type, param) => {
   let api = "";
   let paramText = "";
+  let xg = ""
   switch (type) {
     case aweme: //作品集
       const { secUserId, onePageCount, cursor } = param
-      paramText = `aid=6383&sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      paramText = `aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
+      xg = await getXg(paramText)
       api = `https://www.douyin.com/aweme/v1/web/aweme/post/?${paramText}`
+      api = `${api}&X-Bogus=${xg}`
       break;
     case videoType: //视频
       const { videoUri } = param
@@ -32,8 +35,10 @@ const createApi = (type, param) => {
       break;
     case awemeDetail://作品详情
       const { aweme_id } = param
-      paramText = `aid=6383&aweme_id=${aweme_id}`
-      api = `https://www.iesdouyin.com/aweme/v1/web/aweme/detail/?${paramText}`
+      paramText = `aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&aweme_id=${aweme_id}`
+      xg = await getXg(paramText)
+      api = `https://www.douyin.com/aweme/v1/web/aweme/detail/?${paramText}`
+      api = `${api}&X-Bogus=${xg}`
       break;
     case awemeAvatar://作者头像
       const { fileUri } = param
@@ -41,10 +46,10 @@ const createApi = (type, param) => {
       break;
   }
 
-  //加密参数
-  api = `${api}&X-Bogus=${getXg(paramText)}`
-
-  return api;
+  return {
+    xg,
+    api
+  };
 }
 
 const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
@@ -74,7 +79,13 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     downloadTimeCost: 0
   }
 
-  const api = createApi(aweme, { secUserId, onePageCount: 30, cursor })
+  const { api, xg } = await createApi(aweme, { secUserId, onePageCount: 30, cursor })
+
+  if (!xg) {
+    log('未获取到xg参数，将跳过当前用户~');
+    return downloadStatus
+  }
+
   const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
@@ -170,7 +181,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 }
 
 const getUserInfo = async (secUserId) => {
-  const api = createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
+  const { api } = createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
   const postListResRaw = await request.get(api)
     .then((res) => {
       return res.data
@@ -189,7 +200,7 @@ const getUserInfo = async (secUserId) => {
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
     const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
-    const api = createApi(awemeAvatar, { fileUri });
+    const { api } = createApi(awemeAvatar, { fileUri });
     await saveFile(api, picPath, fileName);
   }
 
@@ -210,7 +221,7 @@ const getUserInfo = async (secUserId) => {
 //        sec_uid             用户id
 //    desc                    作品内容
 const downloadPicture = async (secUserId, aweme_id, path) => {
-  const api = createApi(awemeDetail, { aweme_id })
+  const { api } = createApi(awemeDetail, { aweme_id })
 
   // log(api);
 
@@ -236,7 +247,7 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
 
 
 const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
-  const api = createApi(videoType, { videoUri });
+  const { api } = createApi(videoType, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
   return [{ ...await saveFile(api, path, fileName) }];
 }
