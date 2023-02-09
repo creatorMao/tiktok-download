@@ -16,7 +16,7 @@ const log = (text) => {
     console.log(text);
 
     if (!currentLogFileName) {
-      startLog();
+      restartLog();
     }
 
     const filePath = path.join(rootPath, logFilePath + "/" + currentLogFileName)
