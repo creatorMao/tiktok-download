@@ -6,7 +6,7 @@ import { getNowDate } from './dateHelper.js'
 
 let currentLogFileName = "";
 
-const startLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
+const restartLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
   createDir(path.join(rootPath, logFilePath))
   currentLogFileName = `${fileName}.txt`;
 }
@@ -25,6 +25,6 @@ const log = (text) => {
 }
 
 export {
-  startLog,
+  restartLog,
   log
 }
