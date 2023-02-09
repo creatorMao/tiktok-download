@@ -250,7 +250,8 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
 const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
   const { api } = await createApi(videoType, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
-  return [{ ...await saveFile(api, path, fileName) }];
+  const res = await saveFile(api, path, fileName)
+  return [res];
 }
 
 export {
