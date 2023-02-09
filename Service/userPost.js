@@ -6,12 +6,17 @@ import { retryCount, delayTimeOut } from '../Config/config.js'
 import { calcSecondDifference, delay } from '../Helper/dateHelper.js'
 import { getXg } from './xg.js'
 import { dataPath } from '../Config/config.js'
-import { downloadTypeOfAll, downloadTypeOfUpdate } from './const.js'
+import {
+  aweme,
+  video as videoType,
+  picture,
+  awemeDetail,
+  awemeAvatar,
+  downloadTypeOfAll,
+  downloadTypeOfUpdate
+} from './const.js'
+import { addAweme } from './aweme.js'
 
-const aweme = "aweme"
-const video = "video"
-const awemeDetail = "aweme-detail"
-const awemeAvatar = "aweme-avatar"
 const createApi = (type, param) => {
   let api = "";
   let paramText = "";
@@ -21,7 +26,7 @@ const createApi = (type, param) => {
       paramText = `aid=6383&sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
       api = `https://www.douyin.com/aweme/v1/web/aweme/post/?${paramText}`
       break;
-    case video: //视频
+    case videoType: //视频
       const { videoUri } = param
       api = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${videoUri}&ratio=1080p&line=0`
       break;
@@ -57,6 +62,7 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 //      play_addr
 //        uri       视频资源id
 //    desc          内容
+//    create_time   发布时间
 // max_cursor     
 // 
 const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status, downloadType = downloadTypeOfAll) => {
@@ -82,20 +88,57 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   log(`${cursor}页，获取到${awemeCount}个作品`);
 
   for (let index = 0; index < awemeCount; index++) {
-    const { aweme_type, aweme_id, video = {} } = aweme_list[index]
+    const { aweme_type, aweme_id, video = {}, desc = "", create_time = "" } = aweme_list[index]
     const path = dataPath + secUserId  //以user_sec_id为文件夹名
+    let downloadRes = []
+    let awemeType = ""
+    await delay(delayTimeOut)
     switch ((aweme_type + "")) {
       case "68":
         log(`${cursor}页，第${index + 1}个作品是图集，正在处理。`);
-        await delay(delayTimeOut)
-        await downloadPicture(secUserId, aweme_id, path, downloadStatus)
+        awemeType = picture
+        downloadRes = await downloadPicture(secUserId, aweme_id, path)
         break;
       case "0":
-        log(`${cursor}页，第${index}个作品是视频，正在处理。`);
-        await delay(delayTimeOut)
-        await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path, downloadStatus);
+        log(`${cursor}页，第${index + 1}个作品是视频，正在处理。`);
+        awemeType = videoType
+        downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
         break;
     }
+
+    //保存作品信息
+    // console.log(downloadRes);
+    for (let j = 0; j < downloadRes.length; j++) {
+      let { fileUrl, msg, downloadSuccessFlag } = downloadRes[j]
+
+      switch (awemeType) {
+        case videoType:
+          log(`视频${msg}`);
+          if (downloadSuccessFlag) {
+            downloadStatus.videoCount++
+          }
+          break;
+        case picture:
+          if (j == 0) {
+            log(`作品${aweme_id}总共有${downloadRes.length}张图`);
+          }
+          log(`第${j + 1}张图片，${msg}`);
+          if (downloadSuccessFlag) {
+            downloadStatus.photoCount++
+          }
+          break;
+      }
+
+      await addAweme({
+        secUserId,
+        awemeId: aweme_id,
+        awemeType,
+        desc,
+        awemeFileUrl: fileUrl,
+        createTime: create_time
+      })
+    }
+    log(`作品${aweme_id}处理完毕！`);
   }
 
   if (awemeCount.length == 0 || max_cursor == 0) {
@@ -166,10 +209,12 @@ const getUserInfo = async (secUserId) => {
 //    author
 //        sec_uid             用户id
 //    desc                    作品内容
-const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
+const downloadPicture = async (secUserId, aweme_id, path) => {
   const api = createApi(awemeDetail, { aweme_id })
 
   // log(api);
+
+  const resList = []
 
   const pictureResRaw = await request.get(api)
     .then((res) => {
@@ -180,35 +225,20 @@ const downloadPicture = async (secUserId, aweme_id, path, downloadStatus) => {
     })
   const { images } = pictureResRaw.aweme_detail
 
-  log(`作品${aweme_id}总共有${images.length}张图`);
-
   for (let index = 0; index < images.length; index++) {
     const { url_list, uri = "" } = images[index]
     const fileName = aweme_id + "-" + uri.replaceAll('/', '-') + '.jpeg' //作品id+图片id
-    const { downloadSuccessFlag, existFlag, msg } = await saveFile(url_list[3], path, fileName);
-    if (downloadSuccessFlag) {
-      log(`图${index + 1},${msg}`)
-      downloadStatus.photoCount++
-    }
-    else {
-      log(`图${index + 1},${msg}`)
-    }
+    const res = await saveFile(url_list[3], path, fileName);
+    resList.push(res);
   }
-  log(`作品${aweme_id}下载完毕！`);
+  return resList
 }
 
 
-const downloadVideo = async (secUserId, aweme_id, videoUri, path, downloadStatus) => {
-  const api = createApi(video, { videoUri });
+const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
+  const api = createApi(videoType, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
-  const { downloadSuccessFlag, existFlag, msg } = await saveFile(api, path, fileName);
-  if (downloadSuccessFlag) {
-    log(`视频,${msg}`)
-    downloadStatus.videoCount++
-  }
-  else {
-    log(`视频,${msg}`)
-  }
+  return [{ ...await saveFile(api, path, fileName) }];
 }
 
 export {

@@ -1,12 +1,13 @@
 import { getRowsBySql, runSql } from '../Helper/dbHelper.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 
-const getAwemeDetail = async (awemeId) => {
+const getAwemeDetail = async (awemeId, awemeFileUrl = "") => {
   let sql = `
-  select * from AWEME where AWEME_ID=$AWEME_ID
+  select * from AWEME where AWEME_ID=$AWEME_ID AND AWEME_FILE_URL=$AWEME_FILE_URL
 `
   const resRaw = await getRowsBySql(sql, {
-    $AWEME_ID: awemeId
+    $AWEME_ID: awemeId,
+    $AWEME_FILE_URL: awemeFileUrl
   })
 
   if (resRaw && resRaw.length > 0) {
@@ -15,8 +16,8 @@ const getAwemeDetail = async (awemeId) => {
   return {}
 }
 
-const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl }) => {
-  const awemeDetail = await getAwemeDetail(awemeId);
+const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl, createTime }) => {
+  const awemeDetail = await getAwemeDetail(awemeId, awemeFileUrl);
   if (awemeDetail.ID) {
     return {
       msg: '该作品记录已存在，无需重新添加！',
@@ -24,8 +25,8 @@ const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl }) =
     }
   }
   else {
-    let sql = `insert into AWEME(ID,SEC_USER_ID,AWEME_ID,AWEME_TYPE,DESC,AWEME_FILE_URL)
-              values($ID,$SEC_USER_ID,$AWEME_ID,$AWEME_TYPE,$DESC,$AWEME_FILE_URL)
+    let sql = `insert into AWEME(ID,SEC_USER_ID,AWEME_ID,AWEME_TYPE,DESC,AWEME_FILE_URL,CREATE_TIME)
+              values($ID,$SEC_USER_ID,$AWEME_ID,$AWEME_TYPE,$DESC,$AWEME_FILE_URL,$CREATE_TIME)
     `
 
     const resRaw = await runSql(sql, {
@@ -34,7 +35,8 @@ const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl }) =
       $AWEME_ID: awemeId,
       $AWEME_TYPE: awemeType,
       $DESC: desc,
-      $AWEME_FILE_URL: awemeFileUrl
+      $AWEME_FILE_URL: awemeFileUrl,
+      $CREATE_TIME: createTime
     });
 
     return resRaw

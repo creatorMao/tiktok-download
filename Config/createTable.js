@@ -28,6 +28,7 @@ const createTableSqlList = [
       AWEME_TYPE        VARCHAR(500),
       DESC              TEXT,
       AWEME_FILE_URL    TEXT,
+      CREATE_TIME       VARCHAR(500),
       IMP_DATE          VARCHAR(10) DEFAULT (date('now')),
       IMP_TIME          VARCHAR(19) DEFAULT (datetime('now','localtime'))
     );

@@ -24,15 +24,17 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
     retryCountTotal = retryCount
   }
 
-  const filePathAbs = path.join(rootPath, filePath + "/" + fileName)
+  const fileUrlAbs = path.join(rootPath, filePath + "/" + fileName)
   let res = {
     msg: '',
     existFlag: false,
-    downloadSuccessFlag: false
+    downloadSuccessFlag: false,
+    fileUrlAbs: fileUrlAbs,
+    fileUrl: filePath + "/" + fileName
   }
   let writer = undefined
 
-  if (fs.existsSync(filePathAbs)) {
+  if (fs.existsSync(fileUrlAbs)) {
     res.msg = "文件已存在！"
     res.existFlag = true
     return res
@@ -41,7 +43,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
     try {
       createDir(path.join(rootPath, filePath))
 
-      writer = fs.createWriteStream(filePathAbs)
+      writer = fs.createWriteStream(fileUrlAbs)
       const response = await axios({
         url,
         method: 'GET',
@@ -59,7 +61,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
           if (writer) {
             writer.end();
             writer.destroy();
-            deleteFile(filePathAbs);
+            deleteFile(fileUrlAbs);
           }
 
           if (retryFlag && currentRetryCount < retryCountTotal) {
@@ -77,7 +79,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       if (writer) {
         writer.end();
         writer.destroy();
-        deleteFile(filePathAbs);
+        deleteFile(fileUrlAbs);
       }
       if (retryFlag && currentRetryCount < retryCountTotal) {
         console.log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 2}次尝试！`);
