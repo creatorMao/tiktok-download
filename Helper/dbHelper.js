@@ -54,10 +54,17 @@ const getRowsBySql = (sql, param = {}) => {
   });
 }
 
-const runSql = (sql, param = {}) => {
-  currentDb.run(sql, param, (err) => {
-    console.log(err);
-  });
+const runSql = async (sql, param = {}) => {
+  return new Promise((resolve) => {
+    currentDb.run(sql, param, (err) => {
+      if (err) {
+        resolve({ msg: err.message, flag: false })
+      }
+      else {
+        resolve({ msg: '执行成功', flag: true })
+      }
+    });
+  })
 }
 
 export {

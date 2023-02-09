@@ -1,5 +1,4 @@
 import { getRowsBySql, runSql } from '../Helper/dbHelper.js'
-import { Ok, err } from '../Helper/returnHelper.js'
 import { getSecUserIdFromShortUrl, getUserInfo } from './userPost.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 
@@ -30,7 +29,7 @@ const addUser = async (homeShortUrl) => {
     let sql = `insert into USER(ID,HOME_SHORT_URL,SEC_USER_ID,NICK_NAME,USER_PIC)
               values($ID,$HOME_SHORT_URL,$SEC_USER_ID,$NICK_NAME,$USER_PIC)
     `
-    runSql(sql, {
+    await runSql(sql, {
       $ID: createGuid(),
       $HOME_SHORT_URL: homeShortUrl,
       $SEC_USER_ID: secUserId,
