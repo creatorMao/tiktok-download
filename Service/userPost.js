@@ -2,7 +2,7 @@ import { request } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
-import { retryCount, delayTimeOut } from '../Config/config.js'
+import { retryCount, delayTimeOut, checkDownloadCount } from '../Config/config.js'
 import { calcSecondDifference, delay } from '../Helper/dateHelper.js'
 import { getXg } from './xg.js'
 import { dataPath } from '../Config/config.js'
@@ -80,7 +80,9 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     downloadTimeCost: 0
   }
 
-  const { api, xg } = await createApi(aweme, { secUserId, onePageCount: 30, cursor })
+  let downloadedCount = 1
+
+  const { api, xg } = await createApi(aweme, { secUserId, onePageCount: 35, cursor })
 
   if (!xg) {
     log('未获取到xg参数，将跳过当前用户~');
@@ -100,6 +102,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   log(`${cursor}页，获取到${awemeCount}个作品`);
 
   for (let index = 0; index < awemeCount; index++) {
+    //增量更新模式，当已下载数量超过配置的数量时，将跳过
+    if (downloadType == downloadTypeOfUpdate && downloadedCount > checkDownloadCount) {
+      log(`当前用户最新的${checkDownloadCount}个作品都已下载，将跳过该用户~`);
+      break
+    }
+
     const { aweme_type, aweme_id, video = {}, desc = "", create_time = "" } = aweme_list[index]
     const path = dataPath + secUserId  //以user_sec_id为文件夹名
     let downloadRes = []
@@ -121,7 +129,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     //保存作品信息
     // log(downloadRes);
     for (let j = 0; j < downloadRes.length; j++) {
-      let { fileUrl, msg, downloadSuccessFlag } = downloadRes[j]
+      let { fileUrl, msg, downloadSuccessFlag, existFlag } = downloadRes[j]
 
       switch (awemeType) {
         case videoType:
@@ -129,10 +137,16 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
           if (downloadSuccessFlag) {
             downloadStatus.videoCount++
           }
+          if (existFlag) {
+            downloadedCount++
+          }
           break;
         case picture:
           if (j == 0) {
             log(`作品${aweme_id}总共有${downloadRes.length}张图`);
+            if (existFlag) {
+              downloadedCount++
+            }
           }
           log(`第${j + 1}张图片，${msg}`);
           if (downloadSuccessFlag) {
