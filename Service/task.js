@@ -6,6 +6,8 @@ import { dbFilePath, newsCenter, downloadType } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
+import { getUserAwemeList } from '../Service/aweme.js'
+import { downloadTypeOfAll } from '../Service/const.js'
 
 const startTask = async () => {
   await initDb(dbFilePath, createTableSqlList);
@@ -34,7 +36,15 @@ const startTask = async () => {
       continue
     }
 
-    const status = await downloadUserPost(user['SEC_USER_ID'], undefined, undefined, undefined, downloadType);//增量更新
+    let secUserId = user['SEC_USER_ID']
+    const awemeList = await getUserAwemeList(secUserId);
+
+    let dlType = downloadType
+    if (awemeList.length == 0) {
+      dlType = downloadTypeOfAll //表里没有数据，直接全量
+    }
+
+    const status = await downloadUserPost(secUserId, undefined, undefined, undefined, dlType);
     log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，耗时${status.downloadTimeCost}秒~`)
     taskStatus.PHOTO_COUNT += status.photoCount
     taskStatus.VIDEO_COUNT += status.videoCount

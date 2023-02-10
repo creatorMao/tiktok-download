@@ -16,6 +16,16 @@ const getAwemeDetail = async (awemeId, awemeFileUrl = "") => {
   return {}
 }
 
+const getUserAwemeList = async (secUserId) => {
+  let sql = `select * from AWEME where SEC_USER_ID=$SEC_USER_ID order by create_time desc`
+
+  const resRaw = await getRowsBySql(sql, {
+    $SEC_USER_ID: secUserId
+  })
+
+  return resRaw
+}
+
 const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl, createTime }) => {
   const awemeDetail = await getAwemeDetail(awemeId, awemeFileUrl);
   if (awemeDetail.ID) {
@@ -44,6 +54,7 @@ const addAweme = async ({ secUserId, awemeId, awemeType, desc, awemeFileUrl, cre
 }
 
 export {
+  getUserAwemeList,
   getAwemeDetail,
   addAweme
 }

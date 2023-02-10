@@ -3,7 +3,7 @@ import { getSecUserIdFromShortUrl, getUserInfo } from './userPost.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 
 const getUserList = async () => {
-  return await getRowsBySql('SELECT * FROM USER');
+  return await getRowsBySql('SELECT * FROM USER order by imp_time desc');
 }
 
 const getUserDetail = async (secUserId) => {

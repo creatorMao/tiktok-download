@@ -105,6 +105,7 @@
       }
     }).then((res) => {
       const { msg = "" } = res.data
+      clearTimeout(timer)
       printMessage(`${msg}`);
     }).catch(res => {
       printMessage('添加失败！')
@@ -169,8 +170,10 @@
   const resetMessage = () => {
     printMessage("", true);
   }
+
+  let timer=undefined
   const getServerLog = async () => {
-    setInterval(async () => {
+    timer=setInterval(async () => {
       const { data } = await axios({
         method: 'get',
         url: '/log/latest',
@@ -200,6 +203,7 @@
       });
 
       printMessage(msg)
+      getServerLog()
     }
     catch (e) {
       printMessage(e.message)
