@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,47 +8,57 @@
   <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
   <title>Document</title>
   <style>
-    html,body,.container{
+    html,
+    body,
+    .container {
       height: 100%;
     }
-    *{
+
+    * {
       margin: 0px;
       padding: 0px;
       font-size: 16px;
     }
-    .container{
+
+    .container {
       width: 90vw;
       margin-left: 5vw;
       display: flex;
       flex-direction: column;
     }
-    #text{
+
+    #text {
       width: 90vw;
       height: 10vh;
       margin-top: 10px;
     }
-    #add{
+
+    #add {
       margin-top: 10px;
     }
-    #res{
+
+    #res {
       width: 90vw;
       height: calc(100% - 10px);
     }
-    .button{
+
+    .button {
       margin-bottom: 5px;
     }
-    .bottom{
+
+    .bottom {
       flex: 1;
       box-sizing: border-box;
       margin-top: 10px;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="top">
       <div>
-        功能1 
+        功能1
         <button onclick="add()" id="add">将用户添加到下载队列</button>
         <button onclick="copyAndAdd()">一键粘贴+添加(不支持safari)</button>
         <button onclick="reset()" id="reset">清空</button>
@@ -61,7 +72,7 @@
       <div class="button">
         功能2
         <button onclick="startUpdate()">启动增量更新</button>
-        <button onclick="stopUpdate()">退出增量更新</button>
+        <button onclick="closeServer()">停止服务</button>
       </div>
       <div>
         ---------------------------------
@@ -77,10 +88,10 @@
   </div>
 </body>
 <script>
-  const add=()=>{
-    const homeShortUrl=filterShortUrl(document.querySelector('#text').value);
-    
-    if(!homeShortUrl){
+  const add = () => {
+    const homeShortUrl = filterShortUrl(document.querySelector('#text').value);
+
+    if (!homeShortUrl) {
       printMessage('请复制正确的短链！');
       return
     }
@@ -88,97 +99,112 @@
     printMessage(`成功获取解析出短链：${homeShortUrl}，正添加到数据库！`);
     axios({
       method: 'post',
-      url:'/user/add',
+      url: '/user/add',
       params: {
         homeShortUrl,
       }
     }).then((res) => {
-      const {msg=""}=res.data
+      const { msg = "" } = res.data
       printMessage(`${msg}`);
     }).catch(res => {
       printMessage('添加失败！')
-      const {msg=""}=res.data
+      const { msg = "" } = res.data
       printMessage(`${msg}`);
     }).finally((res) => {
     });
   }
-  const filterShortUrl=(text)=>{
-    try{
-      if(text)
-      {
+  const closeServer = () => {
+    axios({
+      method: 'get',
+      url: '/server/close'
+    }).then((res) => {
+      const { msg = "" } = res.data
+      printMessage(`${msg}`);
+    }).catch(res => {
+      printMessage('关闭失败~')
+      const { msg = "" } = res.data
+      printMessage(`${msg}`);
+    }).finally((res) => {
+    });
+  }
+  const filterShortUrl = (text) => {
+    try {
+      if (text) {
         return text.match(new RegExp(/((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g))[0];
       }
     }
-    catch{
+    catch {
 
     }
-      return ""
-    }
-  const reset=()=>{
-    document.querySelector('#text').value=""
+    return ""
+  }
+  const reset = () => {
+    document.querySelector('#text').value = ""
   }
 
-  const printMessage=(message,clearAll)=>{
-    const preValue=document.querySelector('#res').value
-    if(clearAll){
-      document.querySelector('#res').value=message
+  const printMessage = (message, clearAll) => {
+    const preValue = document.querySelector('#res').value
+    if (clearAll) {
+      document.querySelector('#res').value = message
     }
-    else{
-      document.querySelector('#res').value=preValue+message+"\n"
+    else {
+      document.querySelector('#res').value = preValue + message + "\n"
     }
 
     var textarea = document.querySelector('#res');
     textarea.scrollTop = textarea.scrollHeight;
   }
-  const copyAndAdd=async ()=>{
+  const copyAndAdd = async () => {
     const clipboard = navigator.clipboard;
-    if(clipboard){
-      const text=await clipboard.readText()
-      document.querySelector('#text').value=text
+    if (clipboard) {
+      const text = await clipboard.readText()
+      document.querySelector('#text').value = text
       add();
     }
-    else{
+    else {
       document.getElementById('text').select();
       document.execCommand('paste')
     }
   }
-  const resetMessage=()=>{
-    printMessage("",true);
+  const resetMessage = () => {
+    printMessage("", true);
   }
-  const getServerLog=async ()=>{
-    setInterval(async ()=>{
-      const {data}=await axios({
-      method: 'get',
-      url:'/log/latest',
-    }).then((res) => {
-      return res.data
-    }).catch(res => {
-    }).finally((res) => {
-    });
+  const getServerLog = async () => {
+    setInterval(async () => {
+      const { data } = await axios({
+        method: 'get',
+        url: '/log/latest',
+      }).then((res) => {
+        return res.data
+      }).catch(res => {
+        printMessage('服务无响应~');
+      }).finally((res) => {
+      });
 
-      printMessage(data,true)
-    },2000)
+      printMessage(data, true)
+    }, 2000)
   }
   getServerLog();
-  const startUpdate=async ()=>{
+  const startUpdate = async () => {
     resetMessage();
 
-    try{
-      const msg=await axios({
-      method: 'get',
-      url:'/task/start',
-    }).then((res) => {
-      const {msg=""}=res.data
-      return msg
-    }).catch(res => {
-    }).finally((res) => {
-    });
+    try {
+      const msg = await axios({
+        method: 'get',
+        url: '/task/start',
+      }).then((res) => {
+        const { msg = "" } = res.data
+        return msg
+      }).catch(res => {
+      }).finally((res) => {
+      });
 
       printMessage(msg)
     }
-    catch(e){
+    catch (e) {
       printMessage(e.message)
     }
   }
 </script>
+
 </html>

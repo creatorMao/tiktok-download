@@ -57,8 +57,18 @@ const initExpress = () => {
     res.send(Ok('已启动~'))
   })
 
+  app.get('/server/close', async function (req, res) {
+    res.send(Ok('正在关闭中~'))
+    process.kill(process.pid, 'SIGTERM');
+  })
+
   app.listen(apiPort, () => {
     log(`程序已启动，请访问http://localhost:${apiPort}/`)
+  })
+
+  process.on('SIGTERM', () => {
+    app.close(() => {
+    })
   })
 }
 
