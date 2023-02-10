@@ -7,6 +7,9 @@
   <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
   <title>Document</title>
   <style>
+    html,body,.container{
+      height: 100%;
+    }
     *{
       margin: 0px;
       padding: 0px;
@@ -15,6 +18,8 @@
     .container{
       width: 90vw;
       margin-left: 5vw;
+      display: flex;
+      flex-direction: column;
     }
     #text{
       width: 90vw;
@@ -26,37 +31,47 @@
     }
     #res{
       width: 90vw;
-      height: 50vh;
-      margin-top: 10px;
+      height: calc(100% - 10px);
     }
     .button{
-      margin-bottom: 20px;
+      margin-bottom: 5px;
+    }
+    .bottom{
+      flex: 1;
+      box-sizing: border-box;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div>
-      请复制用户主页短链接到此输入框：
+    <div class="top">
+      <div>
+        功能1 
+        <button onclick="add()" id="add">将用户添加到下载队列</button>
+        <button onclick="copyAndAdd()">一键粘贴+添加(不支持safari)</button>
+        <button onclick="reset()" id="reset">清空</button>
+      </div>
+      <div>
+        <textarea id="text" name="" id="" cols="30" rows="10" placeholder="复制用户主页短链接到此输入框"></textarea>
+      </div>
+      <div>
+        ---------------------------------
+      </div>
+      <div class="button">
+        功能2
+        <button onclick="startUpdate()">启动增量更新</button>
+        <button onclick="stopUpdate()">退出增量更新</button>
+      </div>
+      <div>
+        ---------------------------------
+      </div>
+      <div>
+        日志
+        <button onclick="resetMessage()">清空</button>
+      </div>
     </div>
-    <div>
-      <textarea id="text" name="" id="" cols="30" rows="10"></textarea>
-    </div>
-    <div class="button">
-      <button onclick="add()" id="add">添加到下载队列</button>
-      <button onclick="copyAndAdd()">粘贴，并添加到下载队列(不支持safari)</button>
-      <button onclick="reset()" id="reset">清空</button>
-    </div>
-    <div>
-      ---------------------------------
-    </div>
-    <div>
-      日志
-    </div>
-    <div style="margin-top: 10px">
-      <button onclick="resetMessage()">清空</button>
-    </div>
-    <div>
+    <div class="bottom">
       <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
     </div>
   </div>
@@ -111,6 +126,9 @@
     else{
       document.querySelector('#res').value=preValue+message+"\n"
     }
+
+    var textarea = document.querySelector('#res');
+    textarea.scrollTop = textarea.scrollHeight;
   }
   const copyAndAdd=async ()=>{
     const clipboard = navigator.clipboard;
@@ -126,6 +144,41 @@
   }
   const resetMessage=()=>{
     printMessage("",true);
+  }
+  const getServerLog=async ()=>{
+    setInterval(async ()=>{
+      const {data}=await axios({
+      method: 'get',
+      url:'/log/latest',
+    }).then((res) => {
+      return res.data
+    }).catch(res => {
+    }).finally((res) => {
+    });
+
+      printMessage(data,true)
+    },2000)
+  }
+  getServerLog();
+  const startUpdate=async ()=>{
+    resetMessage();
+
+    try{
+      const msg=await axios({
+      method: 'get',
+      url:'/task/start',
+    }).then((res) => {
+      const {msg=""}=res.data
+      return msg
+    }).catch(res => {
+    }).finally((res) => {
+    });
+
+      printMessage(msg)
+    }
+    catch(e){
+      printMessage(e.message)
+    }
   }
 </script>
 </html>

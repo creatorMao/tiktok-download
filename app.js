@@ -7,7 +7,8 @@ import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Config/createTable.js'
 import { rootPath } from './Helper/fsHelper.js'
 import path from 'path'
-import { log } from './Helper/logHelper.js'
+import { log, logData } from './Helper/logHelper.js'
+import { startTask } from './Service/task.js'
 
 const initExpress = () => {
   const app = express()
@@ -32,11 +33,11 @@ const initExpress = () => {
     next()
   })
 
-  app.all('/', async function (req, res) {
+  app.get('/', async function (req, res) {
     res.sendFile(path.join(rootPath, './web/index.html'))
   })
 
-  app.all('/user/add', async function (req, res) {
+  app.post('/user/add', async function (req, res) {
     const homeShortUrl = getParam(req, 'homeShortUrl')
     if (!homeShortUrl) {
       res.send(err('请填写homeShortUrl参数！'));
@@ -45,6 +46,15 @@ const initExpress = () => {
 
     const { msg } = await addUser(homeShortUrl);
     res.send(Ok(msg));
+  })
+
+  app.get('/log/latest', async function (req, res) {
+    res.send(Ok('日志获取成功~', logData))
+  })
+
+  app.get('/task/start', async function (req, res) {
+    startTask()
+    res.send(Ok('已启动~'))
   })
 
   app.listen(apiPort, () => {
