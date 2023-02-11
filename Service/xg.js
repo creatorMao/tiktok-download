@@ -16,15 +16,15 @@ const getXg = async (paramText) => {
   paramText = paramText.replaceAll('&', '%26')
 
   //该逻辑来源于https://github.com/johnserf-seed/tiktokdownload,请支持原作者项目。
-  //demo: https://service-i89l2uwx-1257133085.sh.apigw.tencentcs.com/xg/path/?url=aid=6383%26sec_user_id=xxx%26max_cursor=0%26count=10
-  const url = `https://service-i89l2uwx-1257133085.sh.apigw.tencentcs.com/xg/path/?url=${paramText}`
+  //demo: http://47.115.200.238/xg/path/?url=aid=6383%26sec_user_id=xxx%26max_cursor=0%26count=10
+  const url = `http://47.115.200.238/xg/path/?url=${paramText}`
   log(`xg参数，url: ${url}`);
 
   let res = {}
   let xg = "";
 
   try {
-    res = await request.get(url).then((res) => {
+    res = await request.post(url).then((res) => {
       return res.data
     }).catch((err) => {
       log(`xg参数获取失败~原因: ${err}`);
@@ -34,7 +34,7 @@ const getXg = async (paramText) => {
     log(`xg参数获取失败~原因: ${e.message}`);
   }
 
-  const { result = [] } = res
+  const { result = [] } = res || {}
   // log(result);
 
   if (result.length > 0) {
