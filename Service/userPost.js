@@ -119,10 +119,15 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         awemeType = picture
         downloadRes = await downloadPicture(secUserId, aweme_id, path)
         break;
-      case "0":
-        log(`${cursor}页，第${index + 1}个作品是视频，正在处理。`);
+      // case "0":
+      //   log(`${cursor}页，第${index + 1}个作品是视频，正在处理。`);
+      //   awemeType = videoType
+      //   downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+      default:
+        //除了68，先按视频下载
         awemeType = videoType
         downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+        log(`${cursor}页，第${index + 1}个作品是的类型是${aweme_type}`);
         break;
     }
 
