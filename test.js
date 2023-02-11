@@ -13,11 +13,12 @@
 // import { getSecond, getNowDate } from './Helper/dateHelper.js'
 // console.log(getNowDate());
 
-// import { saveFile } from './Helper/fsHelper.js'
-// console.log(2);
-// const res = await saveFile('https://t8.baidu.com/it/u=3616464563,3199287374&fm=217&app=125&size=f242,162&n=0&g=0n&f=JPEG?s=7FEAAB561F5F7CC80C490BFB0300903C&sec=1675929937&t=aafa7485378d4856ce31b0fcd97a1de0', './Data/test', '1.jpg')
-// console.log(res);
-// console.log(1);
+import { saveFile } from './Helper/fsHelper.js'
+console.log(2);
+const res = await saveFile('https://suitplay.net/wp-content/uploads/2022/06/00F144AC-46A6-4298-A2B7-92FF1741D9E3.jpeg', './Data/test', '1.mp4')
+// const res = await saveFile('https1://t8.baidu.com/it/u=3616464563,3199287374&fm=217&app=125&size=f242,162&n=0&g=0n&f=JPEG?s=7FEAAB561F5F7CC80C490BFB0300903C&sec=1675929937&t=aafa7485378d4856ce31b0fcd97a1de0', './Data/test', '1.jpg')
+console.log(res);
+console.log(1);
 
 
 // import { addAweme } from './Service/aweme.js'
@@ -40,7 +41,7 @@
 // console.log(addRes);
 // console.log(2)
 
-import { generateRandomStr } from './Helper/generatorHelper.js'
-import { headers } from './Config/config.js'
-console.log(headers)
-console.log(headers)
+// import { generateRandomStr } from './Helper/generatorHelper.js'
+// import { headers } from './Config/config.js'
+// console.log(headers)
+// console.log(headers)
