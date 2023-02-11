@@ -1,4 +1,4 @@
-import fs, { existsSync, write } from 'fs'
+import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 import { retryCount } from '../Config/config.js'
@@ -7,9 +7,10 @@ import { log } from './logHelper.js'
 const filename = fileURLToPath(import.meta.url) // 这里不能声明__filename,因为已经有内部的__filename了，重复声明会报错
 const _dirname = path.dirname(filename)
 const rootPath = path.join(_dirname, "../")
+import { delay } from './dateHelper.js'
 
 const createDir = (path) => {
-  if (!existsSync(path)) {
+  if (!fs.existsSync(path)) {
     fs.mkdirSync(path);
     return {
       existFlag: false
@@ -23,7 +24,9 @@ const createDir = (path) => {
 }
 
 const deleteFile = (path) => {
-  if (existsSync(path)) {
+  // log(path);
+  if (fs.existsSync(path)) {
+    // log(12);
     fs.unlinkSync(path);
   }
 }
@@ -52,50 +55,25 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
     try {
       createDir(path.join(rootPath, filePath))
 
-      writer = fs.createWriteStream(fileUrlAbs)
       const response = await axios({
         url,
         method: 'GET',
-        responseType: 'stream'
+        timeout: 1000 * 60 * 10, //10分钟下载不下来，不下了~
+        responseType: 'arraybuffer'
       })
-      response.data.pipe(writer)
 
-      return new Promise((resolve, reject) => {
-        writer.on('finish', () => {
-          res.msg = "文件下载成功！"
-          res.downloadSuccessFlag = true
-          resolve(res);
-        })
-        writer.on('error', async (err, writer) => {
-          if (writer) {
-            writer.end();
-            writer.destroy();
-            deleteFile(fileUrlAbs);
-          }
+      fs.writeFileSync(fileUrlAbs, response.data, 'binary')
 
-          if (retryFlag && currentRetryCount < retryCountTotal) {
-            log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 1}次尝试！`);
-            resolve(await saveFile(url, filePath, fileName, true, undefined, currentRetryCount + 1));
-          }
-          else {
-            res.msg = "文件下载失败！"
-            resolve(res);
-          }
-        })
-      })
+      res.msg = "文件下载成功！"
+      res.downloadSuccessFlag = true
+      return res
     }
     catch (err) {
       try {
-        if (writer) {
-          writer.end();
-          writer.destroy();
-          deleteFile(fileUrlAbs);
-        }
-
         deleteFile(fileUrlAbs);
       }
-      catch {
-
+      catch (e) {
+        log(e.message);
       }
 
       if (retryFlag && currentRetryCount < retryCountTotal) {
