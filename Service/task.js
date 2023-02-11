@@ -3,13 +3,14 @@ import { createTableSqlList } from '../Config/createTable.js'
 import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
 import { dbFilePath, newsCenter, downloadType } from '../Config/config.js'
-import { log } from '../Helper/logHelper.js'
+import { log, restartLog } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
 import { getUserAwemeList } from '../Service/aweme.js'
 import { downloadTypeOfAll } from '../Service/const.js'
 
 const startTask = async () => {
+  restartLog()
   await initDb(dbFilePath, createTableSqlList);
 
   const userList = await getUserList();
