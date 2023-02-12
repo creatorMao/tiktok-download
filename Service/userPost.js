@@ -1,4 +1,4 @@
-import { request } from '../Helper/httpHelper.js'
+import { request, requestWithRetry } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
 import { log } from '../Helper/logHelper.js'
 import { saveFile } from '../Helper/fsHelper.js'
@@ -202,15 +202,17 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 
 const getUserInfo = async (secUserId) => {
   const { api } = await createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
-  const postListResRaw = await request.get(api)
-    .then((res) => {
-      return res.data
-    })
-    .catch((err) => {
-      log(err);
-    })
+  const postListResRaw = await requestWithRetry(() => {
+    return request.get(api)
+      .then((res) => {
+        return res.data
+      })
+      .catch((err) => {
+        log(err);
+      })
+  })
 
-  const { aweme_list = [] } = postListResRaw || {}
+  const { aweme_list = [] } = postListResRaw
   let nickName = "";
   const picPath = dataPath + secUserId  //以user_sec_id为文件夹名
   let picPathFull = ""

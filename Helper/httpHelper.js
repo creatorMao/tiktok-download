@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { headers } from '../Config/config.js'
+import { headers, retryCount, delayTimeOut } from '../Config/config.js'
+import { log } from './logHelper.js'
+import { delay } from './dateHelper.js'
 const request = axios.create({ headers });
 
 const getParam = (req, key) => {
@@ -17,7 +19,30 @@ const getParam = (req, key) => {
   return queryRes || bodyRes || ""
 }
 
+const requestWithRetry = async (requestFunction, currentRetryCount = 0) => {
+  let res = undefined
+  try {
+    res = await requestFunction();
+  }
+  catch (e) {
+    log(`请求报错，错误信息${e.message}`)
+  }
+
+  if (!res) {
+    if (currentRetryCount < retryCount) {
+      log(`请求结果返回空，正在进行第${currentRetryCount + 1}次重新获取`);
+      await delay(delayTimeOut)
+      return requestWithRetry(requestFunction, currentRetryCount + 1)
+    }
+    else {
+      log(`无数据，彻底跳出~`);
+    }
+  }
+  return res || {}
+}
+
 export {
+  requestWithRetry,
   request,
   getParam
 }
