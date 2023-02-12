@@ -9,8 +9,10 @@ import { getNowDate } from '../Helper/dateHelper.js'
 import { getUserAwemeList } from '../Service/aweme.js'
 import { downloadTypeOfAll } from '../Service/const.js'
 
-const startTask = async () => {
-  restartLog()
+const startTask = async (restartLogFlag = false) => {
+  if (restartLogFlag) {
+    restartLog()
+  }
   await initDb(dbFilePath, createTableSqlList);
 
   const userList = await getUserList();
