@@ -210,6 +210,14 @@ const getUserInfo = async (secUserId) => {
       .catch((err) => {
         log(err);
       })
+  }, (requestRes) => {
+    const { aweme_list = [], max_cursor = 0 } = requestRes
+    if (aweme_list.length == 0 || max_cursor == 0) {
+      return false
+    }
+    else {
+      return true
+    }
   })
 
   const { aweme_list = [] } = postListResRaw

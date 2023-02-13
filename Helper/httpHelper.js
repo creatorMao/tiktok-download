@@ -19,7 +19,7 @@ const getParam = (req, key) => {
   return queryRes || bodyRes || ""
 }
 
-const requestWithRetry = async (requestFunction, currentRetryCount = 0) => {
+const requestWithRetry = async (requestFunction, checkResultFunction, currentRetryCount = 0) => {
   let res = undefined
   try {
     res = await requestFunction();
@@ -28,11 +28,13 @@ const requestWithRetry = async (requestFunction, currentRetryCount = 0) => {
     log(`请求报错，错误信息${e.message}`)
   }
 
-  if (!res) {
+  let checkResFlag = checkResultFunction(res);
+
+  if (!checkResFlag) {
     if (currentRetryCount < retryCount) {
       log(`请求结果返回空，正在进行第${currentRetryCount + 1}次重新获取`);
       await delay(delayTimeOut)
-      return requestWithRetry(requestFunction, currentRetryCount + 1)
+      return requestWithRetry(requestFunction, checkResultFunction, currentRetryCount + 1)
     }
     else {
       log(`无数据，彻底跳出~`);
