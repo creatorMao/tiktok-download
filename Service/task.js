@@ -27,7 +27,8 @@ const startTask = async (restartLogFlag = false) => {
     CURRENT: 0,
     PROGRESS: 0,
     PHOTO_FAIL_COUNT: 0,
-    VIDEO_FAIL_COUNT: 0
+    VIDEO_FAIL_COUNT: 0,
+    FAIL_TOTAL: 0
   }
 
   log(`本次增量更新，预计将更新${total}个用户~`);
@@ -61,6 +62,7 @@ const startTask = async (restartLogFlag = false) => {
     taskStatus.PROGRESS = ((index + 1) / total).toFixed(2)
     taskStatus.PHOTO_FAIL_COUNT += status.photoFailCount
     taskStatus.VIDEO_FAIL_COUNT += status.videoFailCount
+    taskStatus.FAIL_TOTAL = taskStatus.PHOTO_FAIL_COUNT + taskStatus.VIDEO_FAIL_COUNT
     await sendTaskStatus({ ...taskStatus });
   }
 
