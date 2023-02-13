@@ -4,4 +4,4 @@
   原作者项目语言为python，本项目语言为Nodejs
 
 # 小组件
-<img src='./Assets/IMG_0414.PNG'></img>
+<img style='width:50%' src='./Assets/IMG_0414.PNG'></img>
