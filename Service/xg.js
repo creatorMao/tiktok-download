@@ -3,9 +3,10 @@ import { log } from '../Helper/logHelper.js'
 
 let paramTextOld = ""
 let xgOld = ""
+let count = 1
 
 const getXg = async (paramText) => {
-  log('准备开始获取xg参数');
+  log(`准备开始获取xg参数，接口已使用${count}次`);
 
   if (paramText == paramTextOld) {
     log('已在缓存中找到xg');
@@ -44,6 +45,7 @@ const getXg = async (paramText) => {
 
   paramTextOld = paramText
   xgOld = xg
+  count++
 
   return xg
 }
