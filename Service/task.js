@@ -25,7 +25,9 @@ const startTask = async (restartLogFlag = false) => {
     IMP_TIME: '',
     TOTAL: total,
     CURRENT: 0,
-    PROGRESS: 0
+    PROGRESS: 0,
+    PHOTO_FAIL_COUNT: 0,
+    VIDEO_FAIL_COUNT: 0
   }
 
   log(`本次增量更新，预计将更新${total}个用户~`);
@@ -48,17 +50,21 @@ const startTask = async (restartLogFlag = false) => {
     }
 
     const status = await downloadUserPost(secUserId, undefined, undefined, undefined, dlType);
-    log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，耗时${status.downloadTimeCost}秒~`)
+
+    log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，异常图片${status.photoFailCount}张,异常视频${status.videoFailCount}个,耗时${status.downloadTimeCost}秒~`)
+
     taskStatus.PHOTO_COUNT += status.photoCount
     taskStatus.VIDEO_COUNT += status.videoCount
     taskStatus.DOWNLOAD_TIME_COST += status.downloadTimeCost
     taskStatus.IMP_TIME = getNowDate();
     taskStatus.CURRENT = (index + 1)
     taskStatus.PROGRESS = ((index + 1) / total).toFixed(2)
+    taskStatus.PHOTO_FAIL_COUNT += status.photoFailCount
+    taskStatus.VIDEO_FAIL_COUNT += status.videoFailCount
     await sendTaskStatus({ ...taskStatus });
   }
 
-  log(`本次增量更新更新完毕，下载了${taskStatus.VIDEO_COUNT}个视频,${taskStatus.PHOTO_COUNT}张图片，耗时${taskStatus.DOWNLOAD_TIME_COST}秒~`);
+  log(`本次增量更新更新完毕，下载了${taskStatus.VIDEO_COUNT}个视频,${taskStatus.PHOTO_COUNT}张图片,异常图片${taskStatus.PHOTO_FAIL_COUNT}张,异常视频${taskStatus.VIDEO_FAIL_COUNT}个,耗时${taskStatus.DOWNLOAD_TIME_COST}秒~`);
 }
 
 

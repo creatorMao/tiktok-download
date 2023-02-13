@@ -77,7 +77,9 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     videoCount: 0,
     beginTime: Date.now(),
     endTime: undefined,
-    downloadTimeCost: 0
+    downloadTimeCost: 0,
+    photoFailCount: 0,
+    videoFailCount: 0
   }
 
   let downloadedCount = 1
@@ -142,6 +144,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
           if (downloadSuccessFlag) {
             downloadStatus.videoCount++
           }
+
           if (existFlag) {
             downloadedCount++
           }
@@ -154,10 +157,23 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
             }
           }
           log(`第${j + 1}张图片，${msg}`);
+
           if (downloadSuccessFlag) {
             downloadStatus.photoCount++
           }
           break;
+      }
+
+      if ((!downloadSuccessFlag) && (!existFlag)) {
+        log(`下载异常:用户:${secUserId},异常记录:${JSON.stringify(downloadRes[j])} `)
+        switch (awemeType) {
+          case videoType:
+            downloadStatus.videoFailCount++
+            break;
+          case picture:
+            downloadStatus.photoFailCount++
+            break;
+        }
       }
 
       await addAweme({
@@ -169,14 +185,14 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         createTime: create_time
       })
     }
-    log(`作品${aweme_id}处理完毕！`);
+    log(`作品${aweme_id} 处理完毕！`);
   }
 
   if (awemeCount.length == 0 || max_cursor == 0) {
     //api不是很稳定，有几率没有成功，所以会多尝试几次
     let count = currentRetryCount + 1
     if (currentRetryCount < retryCount) {
-      log(`正在进行第${count}次获取`);
+      log(`正在进行第${count} 次获取`);
       await delay(delayTimeOut)
       return await downloadUserPost(secUserId, cursor, count, downloadStatus);
     }
@@ -270,7 +286,10 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
     const { url_list, uri = "" } = images[index]
     const fileName = aweme_id + "-" + uri.replaceAll('/', '-') + '.jpeg' //作品id+图片id
     const res = await saveFile(url_list[3], path, fileName);
-    resList.push(res);
+    resList.push({
+      ...res,
+      aweme_id
+    });
   }
   return resList
 }
@@ -280,7 +299,10 @@ const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
   const { api } = await createApi(videoType, { videoUri });
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
   const res = await saveFile(api, path, fileName)
-  return [res];
+  return [{
+    ...res,
+    aweme_id
+  }];
 }
 
 export {
