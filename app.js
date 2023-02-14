@@ -9,6 +9,7 @@ import { rootPath } from './Helper/fsHelper.js'
 import path from 'path'
 import { log, logData } from './Helper/logHelper.js'
 import { startTask } from './Service/task.js'
+import { getLatestTaskStatus } from './Service/taskStatus.js'
 
 const initExpress = () => {
   const app = express()
@@ -61,6 +62,10 @@ const initExpress = () => {
   app.get('/server/close', async function (req, res) {
     res.send(Ok('正在关闭中~'))
     process.kill(process.pid, 'SIGTERM');
+  })
+
+  app.get('/task/status/latest', async function (req, res) {
+    res.send(Ok('', await getLatestTaskStatus()))
   })
 
   app.listen(apiPort, () => {

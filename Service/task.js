@@ -8,6 +8,8 @@ import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
 import { getUserAwemeList } from '../Service/aweme.js'
 import { downloadTypeOfAll } from '../Service/const.js'
+import { createGuid } from '../Helper/generatorHelper.js'
+import { getLatestTaskStatus, addTaskStatus } from './taskStatus.js'
 
 const startTask = async (restartLogFlag = false) => {
   if (restartLogFlag) {
@@ -19,10 +21,10 @@ const startTask = async (restartLogFlag = false) => {
   const total = userList.length
 
   const taskStatus = {
+    TASK_ID: createGuid(),
     PHOTO_COUNT: 0,
     VIDEO_COUNT: 0,
     DOWNLOAD_TIME_COST: 0,
-    IMP_TIME: '',
     TOTAL: total,
     CURRENT: 0,
     PROGRESS: 0,
@@ -57,13 +59,17 @@ const startTask = async (restartLogFlag = false) => {
     taskStatus.PHOTO_COUNT += status.photoCount
     taskStatus.VIDEO_COUNT += status.videoCount
     taskStatus.DOWNLOAD_TIME_COST += status.downloadTimeCost
-    taskStatus.IMP_TIME = getNowDate();
     taskStatus.CURRENT = (index + 1)
     taskStatus.PROGRESS = ((index + 1) / total).toFixed(2)
     taskStatus.PHOTO_FAIL_COUNT += status.photoFailCount
     taskStatus.VIDEO_FAIL_COUNT += status.videoFailCount
     taskStatus.FAIL_TOTAL = taskStatus.PHOTO_FAIL_COUNT + taskStatus.VIDEO_FAIL_COUNT
-    await sendTaskStatus({ ...taskStatus });
+
+    await addTaskStatus(taskStatus)
+    const latestTaskStatus = await getLatestTaskStatus()
+    if (latestTaskStatus.ID) {
+      await sendTaskStatus({ ...latestTaskStatus });
+    }
   }
 
   log(`本次增量更新更新完毕，下载了${taskStatus.VIDEO_COUNT}个视频,${taskStatus.PHOTO_COUNT}张图片,异常图片${taskStatus.PHOTO_FAIL_COUNT}张,异常视频${taskStatus.VIDEO_FAIL_COUNT}个,耗时${taskStatus.DOWNLOAD_TIME_COST}秒~`);

@@ -59,6 +59,7 @@ const runSql = async (sql, param = {}) => {
   return new Promise((resolve) => {
     currentDb.run(sql, param, (err) => {
       if (err) {
+        log(err.message)
         resolve({ msg: err.message, flag: false })
       }
       else {

@@ -33,6 +33,28 @@ const createTableSqlList = [
       IMP_TIME          VARCHAR(19) DEFAULT (datetime('now','localtime'))
     );
     `
+  },
+  {
+    tableCode: 'TASK_STATUS',
+    tableName: '下载记录表',
+    sql: `
+    CREATE TABLE TASK_STATUS
+    (
+      ID                  VARCHAR(500)   PRIMARY KEY      NOT NULL,
+      TASK_ID             VARCHAR(500),
+      PHOTO_COUNT         INT,
+      VIDEO_COUNT         INT,
+      DOWNLOAD_TIME_COST  INT,
+      TOTAL               INT,
+      CURRENT             INT,
+      PROGRESS            VARCHAR(500),
+      PHOTO_FAIL_COUNT    INT,
+      VIDEO_FAIL_COUNT    INT,
+      FAIL_TOTAL          INT,
+      IMP_DATE            VARCHAR(10) DEFAULT (date('now')),
+      IMP_TIME            VARCHAR(19) DEFAULT (datetime('now','localtime'))
+    );
+    `
   }
 ]
 
