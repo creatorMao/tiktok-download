@@ -58,7 +58,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       const response = await axios({
         url,
         method: 'GET',
-        timeout: 1000 * 60 * 10, //10分钟下载不下来，不下了~
+        timeout: 1000 * 60 * 10 * 2, //20分钟下载不下来，不下了~
         responseType: 'arraybuffer'
       })
 
