@@ -126,10 +126,10 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       //   awemeType = videoType
       //   downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
       default:
-        //除了68，先按视频下载
+        //除了68，其他统一先按视频下载
+        log(`${cursor}页，第${index + 1}个作品是的类型是${aweme_type},统一按视频处理~`);
         awemeType = videoType
         downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
-        log(`${cursor}页，第${index + 1}个作品是的类型是${aweme_type}`);
         break;
     }
 
