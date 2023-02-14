@@ -165,7 +165,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       }
 
       if ((!downloadSuccessFlag) && (!existFlag)) {
-        log(`下载异常:用户:${secUserId},异常记录:${JSON.stringify(downloadRes[j])} `)
+        log(`异常:用户:${secUserId},异常记录:${JSON.stringify(downloadRes[j])} `)
         switch (awemeType) {
           case videoType:
             downloadStatus.videoFailCount++
