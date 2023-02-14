@@ -20,7 +20,7 @@ const getParam = (req, key) => {
 }
 
 const requestWithRetry = async (requestFunction, checkResultFunction, currentRetryCount = 0) => {
-  let res = undefined
+  let res = {}
   try {
     res = await requestFunction();
   }
