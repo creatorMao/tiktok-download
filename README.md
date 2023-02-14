@@ -20,7 +20,7 @@ npm run start
 
 ## 3. 访问站点http://localhost:3000
 
-<img style='width:70%' src='./Assets/uTools_1676362581440.png'></img>
+<img style='width:100%' src='./Assets/uTools_1676362581440.png'></img>
 
 
 # 接口
