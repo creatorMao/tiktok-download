@@ -17,7 +17,9 @@ const startTask = async (restartLogFlag = false) => {
   }
   await initDb(dbFilePath, createTableSqlList);
 
-  const userList = await getUserList();
+  const userList = await getUserList().filter((item) => {
+    return (item.DOWNLOAD_FLAG == '1')
+  });
   const total = userList.length
 
   const taskStatus = {
@@ -38,11 +40,6 @@ const startTask = async (restartLogFlag = false) => {
     const nickName = userList[index]["NICK_NAME"]
     log(`正在更新第${index + 1}个用户,用户名:【${nickName}】`)
     const user = userList[index]
-
-    if (user.DOWNLOAD_FLAG == '0') {
-      log(`该用户设置了不更新，将跳过~`)
-      continue
-    }
 
     let secUserId = user['SEC_USER_ID']
     const awemeList = await getUserAwemeList(secUserId);
