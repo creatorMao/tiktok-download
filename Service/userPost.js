@@ -194,19 +194,18 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     if (currentRetryCount < retryCount) {
       log(`正在进行第${count} 次获取`);
       await delay(delayTimeOut)
-      return await downloadUserPost(secUserId, cursor, count, downloadStatus);
+      return await downloadUserPost(secUserId, cursor, count, downloadStatus, downloadType);
     }
     else {
       log(`无数据，彻底跳出~`);
     }
   }
   else {
-
     //全量更新，才需要翻页，增量更新，第一页检查一下有没有漏，不会再查询第二页。
     if (downloadType == downloadTypeOfAll) {
       //递归翻页，当返回的max_cursor为0时，返回首页，递归结束
       await delay(delayTimeOut)
-      return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus);
+      return await downloadUserPost(secUserId, max_cursor, undefined, downloadStatus, downloadType);
     }
   }
 
