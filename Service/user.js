@@ -1,6 +1,8 @@
 import { getRowsBySql, runSql } from '../Helper/dbHelper.js'
 import { getSecUserIdFromShortUrl, getUserInfo } from './userPost.js'
 import { createGuid } from '../Helper/generatorHelper.js'
+import { homeUrlPrefix } from '../Config/config.js'
+import { log } from '../Helper/logHelper.js'
 
 const getUserList = async () => {
   return await getRowsBySql('SELECT * FROM USER order by imp_time desc');
@@ -15,8 +17,29 @@ const getUserDetail = async (secUserId) => {
   })
 }
 
-const addUser = async (homeShortUrl) => {
-  const secUserId = await getSecUserIdFromShortUrl(homeShortUrl);
+const getSecUserIdFromUrl = async (url) => {
+  let secUserId = ""
+  if (url.indexOf(homeUrlPrefix) != "-1") {
+    log('该链接属于长链~');
+    secUserId = url.replaceAll(homeUrlPrefix, '')
+  }
+  else {
+    log('该链接属于短链~');
+    secUserId = await getSecUserIdFromShortUrl(url);
+  }
+  log(`分析出secUserId为【${secUserId}】`);
+  return secUserId
+}
+
+const addUser = async (url) => {
+  const secUserId = await getSecUserIdFromUrl(url);
+  if (!secUserId) {
+    return {
+      msg: 'secUserId获取不到，请复制正确的主页链接！',
+      flag: false
+    }
+  }
+
   const userDetail = await getUserDetail(secUserId)
   if (userDetail.length > 0) {
     return {
@@ -31,7 +54,7 @@ const addUser = async (homeShortUrl) => {
     `
     await runSql(sql, {
       $ID: createGuid(),
-      $HOME_SHORT_URL: homeShortUrl,
+      $HOME_SHORT_URL: url,
       $SEC_USER_ID: secUserId,
       $NICK_NAME: nickName,
       $USER_PIC: picPathFull

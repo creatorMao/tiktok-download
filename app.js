@@ -40,14 +40,15 @@ const initExpress = () => {
   })
 
   app.post('/user/add', async function (req, res) {
-    const homeShortUrl = getParam(req, 'homeShortUrl')
-    log(`正在添加短链：${homeShortUrl}`)
-    if (!homeShortUrl) {
-      res.send(err('请填写homeShortUrl参数！'));
+    const url = getParam(req, 'url')
+    log(`获取到url参数：${url}`)
+    if (!url) {
+      res.send(err('请填写url参数！'));
       return
     }
 
-    const { msg } = await addUser(homeShortUrl);
+    const { msg } = await addUser(url);
+    log(msg)
     res.send(Ok(msg));
   })
 
