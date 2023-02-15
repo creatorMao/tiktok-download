@@ -1,3 +1,3 @@
 import { startTask } from './Service/task.js'
 
-startTask();
+startTask(true);
