@@ -3,6 +3,7 @@ import { getSecUserIdFromShortUrl, getUserInfo } from './userPost.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 import { homeUrlPrefix } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
+import { removeQueryParam } from '../Helper/urlHelper.js'
 
 const getUserList = async () => {
   return await getRowsBySql('SELECT * FROM USER order by imp_time desc');
@@ -18,6 +19,8 @@ const getUserDetail = async (secUserId) => {
 }
 
 const getSecUserIdFromUrl = async (url) => {
+  url = removeQueryParam(url)
+  log(`链接去除掉查询参数后:为【${url}】`);
   let secUserId = ""
   if (url.indexOf(homeUrlPrefix) != "-1") {
     log('该链接属于长链~');

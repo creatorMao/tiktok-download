@@ -59,17 +59,26 @@
 // console.log('2');
 
 
-import { CronJob } from 'cron'
-import { startTask } from './Service/task.js'
+// import { CronJob } from 'cron'
+// import { startTask } from './Service/task.js'
 
-console.log(1)
-console.log(CronJob)
-let job = new CronJob(
-  '1 18,20 17 * * *',
-  () => {
-    startTask(true)
-  },
-  null,
-  true
-);
-console.log(2)
+// console.log(1)
+// console.log(CronJob)
+// let job = new CronJob(
+//   '1 18,20 17 * * *',
+//   () => {
+//     startTask(true)
+//   },
+//   null,
+//   true
+// );
+// console.log(2)
+
+
+import url from 'url'
+import { removeQueryParam } from './Helper/urlHelper.js'
+let urlText = "https://www.douyin.com/user/MS4wLjABAAAA8wxawYDUArgcTYVlqVW1lmzNnP8VGWXXa1YZctg9xfI"
+const urlObj = url.parse(urlText)
+console.log(urlObj.path)
+console.log(urlObj)
+console.log(removeQueryParam(urlText));

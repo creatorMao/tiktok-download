@@ -14,6 +14,12 @@ const getQueryParamByUrl = (urlText, key) => {
   return value
 }
 
+const removeQueryParam = (urlText) => {
+  const urlObj = url.parse(urlText)
+  return urlText.replaceAll(urlObj.search, '')
+}
+
 export {
+  removeQueryParam,
   getQueryParamByUrl
 }
