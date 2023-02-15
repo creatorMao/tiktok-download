@@ -17,7 +17,7 @@ const startTask = async (restartLogFlag = false) => {
   }
   await initDb(dbFilePath, createTableSqlList);
 
-  const userList = await getUserList().filter((item) => {
+  const userList = (await getUserList()).filter((item) => {
     return (item.DOWNLOAD_FLAG == '1')
   });
   const total = userList.length
