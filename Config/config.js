@@ -12,6 +12,7 @@ const newsCenter = {
   groupId: 'tiktok-download-status',
   url: ''
 }
+const cronJobTime = "1 1 10,16,22 * * *" //每天上午10点1秒、下午4点1秒、晚上10点1秒，各跑一次增量下载，一天总共3次
 
 const headers = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
@@ -32,5 +33,6 @@ export {
   headers,
   dataPath,
   logFilePath,
-  checkDownloadCount
+  checkDownloadCount,
+  cronJobTime
 }

@@ -46,14 +46,30 @@
 // console.log(headers)
 // console.log(headers)
 
-import { request, requestWithRetry } from './Helper/httpHelper.js'
+// import { request, requestWithRetry } from './Helper/httpHelper.js'
 
-console.log('1');
-const res = await requestWithRetry(() => {
-  return request.get('http://1:3000/news/get?groupId=a1')
-    .then((res) => {
-      return res.data
-    })
-})
-console.log(res)
-console.log('2');
+// console.log('1');
+// const res = await requestWithRetry(() => {
+//   return request.get('http://1:3000/news/get?groupId=a1')
+//     .then((res) => {
+//       return res.data
+//     })
+// })
+// console.log(res)
+// console.log('2');
+
+
+import { CronJob } from 'cron'
+import { startTask } from './Service/task.js'
+
+console.log(1)
+console.log(CronJob)
+let job = new CronJob(
+  '1 18,20 17 * * *',
+  () => {
+    startTask(true)
+  },
+  null,
+  true
+);
+console.log(2)

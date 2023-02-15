@@ -10,6 +10,7 @@ import path from 'path'
 import { log, logData } from './Helper/logHelper.js'
 import { startTask } from './Service/task.js'
 import { getLatestTaskStatus } from './Service/taskStatus.js'
+import { startCronJob } from './Service/cronJob.js'
 
 const initExpress = () => {
   const app = express()
@@ -80,6 +81,7 @@ const initExpress = () => {
 
 const init = async () => {
   await initDb(dbFilePath, createTableSqlList);
+  startCronJob();
   initExpress();
 }
 
