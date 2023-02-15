@@ -4,6 +4,9 @@ import { log } from './logHelper.js'
 let currentDb = null;
 
 const initDb = async (dbFilePath, createTableSqlList) => {
+  if (currentDb) {
+    return currentDb
+  }
 
   log('正在连接数据库');
   const db = connectDb(dbFilePath);
