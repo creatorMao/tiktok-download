@@ -28,7 +28,7 @@ const requestWithRetry = async (requestFunction, checkResultFunction, currentRet
     log(`请求报错，错误信息${e.message}`)
   }
 
-  let checkResFlag = checkResultFunction(res);
+  let checkResFlag = checkResultFunction(res || {});
 
   if (!checkResFlag) {
     if (currentRetryCount < retryCount) {

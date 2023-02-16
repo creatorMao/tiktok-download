@@ -226,7 +226,13 @@ const getUserInfo = async (secUserId) => {
         log(err);
       })
   }, (requestRes) => {
+    //log(requestRes);
     const { aweme_list = [], max_cursor = 0 } = requestRes
+
+    if (!aweme_list) {
+      return false
+    }
+
     if (aweme_list.length == 0 || max_cursor == 0) {
       return false
     }
@@ -240,13 +246,16 @@ const getUserInfo = async (secUserId) => {
   const picPath = dataPath + secUserId  //以user_sec_id为文件夹名
   let picPathFull = ""
 
-  if (aweme_list.length > 0) {
+  if (aweme_list && aweme_list.length > 0) {
     nickName = aweme_list[0].author.nickname
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
     const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
     const { api } = await createApi(awemeAvatar, { fileUri });
     await saveFile(api, picPath, fileName);
+  }
+  else {
+    log('获取用户名称和头像失败~')
   }
 
   return {
