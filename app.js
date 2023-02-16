@@ -1,11 +1,11 @@
 import express from 'express'
-import { apiPort, dbFilePath } from './Config/config.js'
+import { apiPort, dbFilePath, dataPath } from './Config/config.js'
 import { getParam } from './Helper/httpHelper.js'
 import { addUser } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Config/createTable.js'
-import { rootPath } from './Helper/fsHelper.js'
+import { rootPath, createDir } from './Helper/fsHelper.js'
 import path from 'path'
 import { log, logData } from './Helper/logHelper.js'
 import { startTask } from './Service/task.js'
@@ -80,7 +80,20 @@ const initExpress = () => {
   })
 }
 
+const initDataPath = () => {
+  const fileSavePath = path.join(rootPath, dataPath)
+  const { existFlag } = createDir(fileSavePath)
+  if (existFlag) {
+    log('数据文件夹已存在，将跳过');
+  }
+  else {
+    log('数据文件夹初始化成功~');
+  }
+  log(`数据文件夹路径:${fileSavePath}`);
+}
+
 const init = async () => {
+  initDataPath();
   await initDb(dbFilePath, createTableSqlList);
   startCronJob();
   initExpress();
