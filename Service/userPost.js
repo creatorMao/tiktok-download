@@ -100,7 +100,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       log(err);
     })
 
-  const { aweme_list = [], max_cursor = 0 } = postListResRaw || {}
+  let { aweme_list = [], max_cursor = 0 } = postListResRaw || {}
+
+  if (!aweme_list) {
+    aweme_list = []//防止报错
+  }
+
   const awemeCount = aweme_list.length
   log(`${cursor}页，获取到${awemeCount}个作品`);
 
