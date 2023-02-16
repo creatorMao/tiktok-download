@@ -254,6 +254,8 @@ const getUserInfo = async (secUserId) => {
     picPathFull = picPath + "/" + fileName
     const { api } = await createApi(awemeAvatar, { fileUri });
     await saveFile(api, picPath, fileName);
+
+    log(`获取到用户昵称：${nickName}`);
   }
   else {
     log('获取用户名称和头像失败~', errorLevel)
