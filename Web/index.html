@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+  <title>tiktok-download</title>
+  <style>
+    html,
+    body,
+    .container {
+      height: 100%;
+    }
+
+    * {
+      margin: 0px;
+      padding: 0px;
+      font-size: 16px;
+    }
+
+    .container {
+      width: 90vw;
+      margin-left: 5vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #text {
+      width: 90vw;
+      height: 7vh;
+      margin-top: 10px;
+    }
+
+    #add {
+      margin-top: 10px;
+    }
+
+    #res {
+      width: 90vw;
+      height: calc(100% - 10px);
+    }
+
+    .button {
+      margin-bottom: 5px;
+    }
+
+    .bottom {
+      flex: 1;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <textarea id="text" name="" id="" cols="30" rows="10" placeholder="复制用户主页短链/长链到此输入框,是主页链接！！！！！不是视频链接！！！！"></textarea>
+      </div>
+      <div>
+        功能1
+        <button onclick="add()" id="add">将输入框里的用户添加到下载队列</button>
+        <button onclick="copyAndAdd()">一键粘贴+添加(不支持safari)</button>
+        <button onclick="reset()" id="reset">清空输入框</button>
+      </div>
+      <div>
+        ---------------------------------
+      </div>
+      <div class="button">
+        功能2
+        <button onclick="startUpdate()">启动增量更新</button>
+        <button onclick="closeServer()">停止服务</button>
+      </div>
+      <div>
+        ---------------------------------
+      </div>
+      <!-- <div>
+        日志
+        <button onclick="resetMessage()">清空</button>
+      </div> -->
+    </div>
+    <div class="bottom">
+      <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
+    </div>
+  </div>
+</body>
+<script>
+  const add = () => {
+    const url = filterUrl(document.querySelector('#text').value);
+
+    if (!url) {
+      alert('请复制正确的链接！');
+      return
+    }
+
+    axios({
+      method: 'post',
+      url: '/user/add',
+      params: {
+        url,
+      }
+    }).then((res) => {
+      const { msg = "" } = res.data
+    }).catch(res => {
+      const { msg = "" } = res.data
+    }).finally((res) => {
+    });
+  }
+  const closeServer = () => {
+    axios({
+      method: 'get',
+      url: '/server/close'
+    }).then((res) => {
+      const { msg = "" } = res.data
+      printMessage(`${msg}`);
+    }).catch(res => {
+      printMessage('关闭失败~')
+      const { msg = "" } = res.data
+      printMessage(`${msg}`);
+    }).finally((res) => {
+    });
+  }
+  const filterUrl = (text) => {
+    try {
+      if (text) {
+        return text.match(new RegExp(/((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g))[0];
+      }
+    }
+    catch {
+
+    }
+    return ""
+  }
+  const reset = () => {
+    document.querySelector('#text').value = ""
+  }
+
+  const printMessage = (message, clearAll) => {
+    const preValue = document.querySelector('#res').value
+    if (clearAll) {
+      document.querySelector('#res').value = message
+    }
+    else {
+      document.querySelector('#res').value = preValue + message + "\n"
+    }
+
+    var textarea = document.querySelector('#res');
+    textarea.scrollTop = textarea.scrollHeight;
+  }
+  const copyAndAdd = async () => {
+    const clipboard = navigator.clipboard;
+    if (clipboard) {
+      const text = await clipboard.readText()
+      document.querySelector('#text').value = text
+      add();
+    }
+    else {
+      document.getElementById('text').select();
+      document.execCommand('paste')
+    }
+  }
+  const resetMessage = () => {
+    printMessage("", true);
+  }
+
+  let timer=undefined
+  const getServerLog = async () => {
+    timer=setInterval(async () => {
+      const { data } = await axios({
+        method: 'get',
+        url: '/log/latest',
+      }).then((res) => {
+        return res.data
+      }).catch(res => {
+        printMessage('服务无响应~');
+      }).finally((res) => {
+      });
+
+      printMessage(data, true)
+    }, 2000)
+  }
+  getServerLog();
+  const startUpdate = async () => {
+    resetMessage();
+
+    try {
+      const msg = await axios({
+        method: 'get',
+        url: '/task/start',
+      }).then((res) => {
+        const { msg = "" } = res.data
+        return msg
+      }).catch(res => {
+      }).finally((res) => {
+      });
+
+      printMessage(msg)
+      getServerLog()
+    }
+    catch (e) {
+      printMessage(e.message)
+    }
+  }
+</script>
+
+</html>
