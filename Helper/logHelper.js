@@ -17,24 +17,42 @@ const restartLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
   logData = ""
 }
 
-const log = (logText) => {
-  if (logText) {
-    console.log(logText);
+const getLogLevelText = (logLevel) => {
+  let res = "";
+  switch (logLevel) {
+    case "error":
+      res = "异常"
+      break;
+    default:
+      res = "日志"
+      break;
+  }
+  return res
+}
 
+const log = (logText, logLevel) => {
+  if (logText) {
     if (!currentLogFileName) {
       restartLog();
     }
 
-    logText = `${getNowDate('YYYY-MM-DD-HH-mm-ss: ')}${logText}\n`
+    logText = `${getNowDate('YYYY-MM-DD-HH-mm-ss')}【${getLogLevelText(logLevel)}】${logText}`
+    console.log(logText);//控制台输出
 
+    logText += "\n"
     fs.appendFileSync(path.join(currentLogPath, "/" + currentLogFileName), logText, 'utf8');
 
     logData += logText
   }
 }
 
+const logLevel = {
+  errorLevel: 'error'
+}
+
 export {
   logData,
   restartLog,
-  log
+  log,
+  logLevel
 }

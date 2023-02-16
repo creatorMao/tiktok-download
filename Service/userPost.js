@@ -1,6 +1,7 @@
 import { request, requestWithRetry } from '../Helper/httpHelper.js'
 import { getQueryParamByUrl } from '../Helper/urlHelper.js'
-import { log } from '../Helper/logHelper.js'
+import { log, logLevel } from '../Helper/logHelper.js'
+const { errorLevel } = logLevel
 import { saveFile } from '../Helper/fsHelper.js'
 import { retryCount, delayTimeOut, checkDownloadCount } from '../Config/config.js'
 import { calcSecondDifference, delay } from '../Helper/dateHelper.js'
@@ -165,7 +166,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       }
 
       if ((!downloadSuccessFlag) && (!existFlag)) {
-        log(`异常:用户:${secUserId},异常记录:${JSON.stringify(downloadRes[j])} `)
+        log(`用户:${secUserId},异常记录:${JSON.stringify(downloadRes[j])} `, errorLevel)
         switch (awemeType) {
           case videoType:
             downloadStatus.videoFailCount++
@@ -255,7 +256,7 @@ const getUserInfo = async (secUserId) => {
     await saveFile(api, picPath, fileName);
   }
   else {
-    log('获取用户名称和头像失败~')
+    log('获取用户名称和头像失败~', errorLevel)
   }
 
   return {

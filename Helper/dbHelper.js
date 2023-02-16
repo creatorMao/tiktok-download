@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3'
-import { log } from './logHelper.js'
-
+import { log, logLevel } from './logHelper.js'
+const { errorLevel } = logLevel
 let currentDb = null;
 
 const initDb = async (dbFilePath, createTableSqlList) => {
@@ -62,7 +62,7 @@ const runSql = async (sql, param = {}) => {
   return new Promise((resolve) => {
     currentDb.run(sql, param, (err) => {
       if (err) {
-        log(`异常：${err.message}`)
+        log(`${err.message}`, errorLevel)
         resolve({ msg: err.message, flag: false })
       }
       else {
