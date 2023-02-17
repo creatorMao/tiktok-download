@@ -55,6 +55,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
     try {
       createDir(path.join(rootPath, filePath))
 
+      log('正在下载文件~');
       const response = await axios({
         url,
         method: 'GET',
