@@ -36,7 +36,7 @@ const initExpress = () => {
   })
 
   app.get('/', async function (req, res) {
-    res.sendFile(path.join(rootPath, './web/index.html'))
+    res.sendFile(path.join(rootPath, './Web/Simple/index.html'))
   })
 
   app.post('/user/add', async function (req, res) {
