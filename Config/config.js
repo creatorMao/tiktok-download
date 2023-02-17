@@ -3,7 +3,7 @@ import { downloadTypeOfUpdate, downloadTypeOfAll } from '../Service/const.js'
 const downloadType = downloadTypeOfUpdate
 const homeUrlPrefix = "https://www.douyin.com/user/"
 const retryCount = 3 //重试次数
-const checkDownloadCount = 3 //检查已下载数量跳过数
+const checkDownloadCount = 5 //检查已下载数量跳过数
 const apiPort = 3000
 const dataPath = './Data/' //数据目录
 const dbFilePath = dataPath + 'basedb.db' //数据库文件
