@@ -70,6 +70,7 @@ const getSecUserIdFromShortUrl = async (userHomeShortUrl) => {
 //        uri       视频资源id
 //    desc          内容
 //    create_time   发布时间
+//    is_top        是否置顶
 // max_cursor     
 // 
 const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, status, downloadType = downloadTypeOfAll) => {
@@ -105,6 +106,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   if (!aweme_list) {
     aweme_list = []//防止报错
   }
+  // log(JSON.stringify(aweme_list))
 
   const awemeCount = aweme_list.length
   log(`${cursor}页，获取到${awemeCount}个作品`);
@@ -112,15 +114,22 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
   for (let index = 0; index < awemeCount; index++) {
     //增量更新模式，当已下载数量超过配置的数量时，将跳过
     if (downloadType == downloadTypeOfUpdate && downloadedCount > checkDownloadCount) {
-      log(`当前用户最新的${checkDownloadCount}个作品都已下载，将跳过该用户~`);
+      log(`当前用户最新的${checkDownloadCount}个作品都已下载(跳过置顶)，将跳过该用户~`);
       break
     }
 
-    const { aweme_type, aweme_id, video = {}, desc = "", create_time = "" } = aweme_list[index]
+    const { aweme_type, aweme_id, video = {}, desc = "", create_time = "", is_top = 0 } = aweme_list[index]
+
     const path = dataPath + secUserId  //以user_sec_id为文件夹名
     let downloadRes = []
     let awemeType = ""
+
     await delay(delayTimeOut)
+
+    if (is_top) {
+      log(`${cursor}页，第${index + 1}个作品是置顶的~`);
+    }
+
     switch ((aweme_type + "")) {
       case "68":
         log(`${cursor}页，第${index + 1}个作品是图集，正在处理。`);
@@ -151,14 +160,14 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
             downloadStatus.videoCount++
           }
 
-          if (existFlag) {
+          if (existFlag && is_top == 0) { //置顶不算
             downloadedCount++
           }
           break;
         case picture:
           if (j == 0) {
             log(`作品${aweme_id}总共有${downloadRes.length}张图`);
-            if (existFlag) {
+            if (existFlag && is_top == 0) { //置顶不算
               downloadedCount++
             }
           }
