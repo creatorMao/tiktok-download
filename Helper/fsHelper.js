@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
-import { retryCount } from '../Config/config.js'
+import { retryCount, delayTimeOut } from '../Config/config.js'
 import { fileURLToPath } from 'url'
 import { log } from './logHelper.js'
 const filename = fileURLToPath(import.meta.url) // 这里不能声明__filename,因为已经有内部的__filename了，重复声明会报错
@@ -79,9 +79,11 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
 
       if (retryFlag && currentRetryCount < retryCountTotal) {
         log(`可能因为网络原因，第${currentRetryCount + 1}次下载失败，正在进行第${currentRetryCount + 2}次尝试！`);
+        await delay(delayTimeOut)
         return await saveFile(url, filePath, fileName, true, retryCountTotal, currentRetryCount + 1);
       }
       else {
+        log('仍然下载失败，彻底跳出~')
         res.msg = err.message
         return res
       }
