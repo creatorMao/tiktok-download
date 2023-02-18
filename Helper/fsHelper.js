@@ -60,7 +60,13 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
         url,
         method: 'GET',
         timeout: 1000 * 60 * 10 * 2, //20分钟下载不下来，不下了~
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
+        onDownloadProgress: (progressEvent) => {
+          // log(JSON.stringify(progressEvent));
+          //{"loaded":1589014,"total":3214424,"progress":0.49433864356413465,"bytes":16384,"rate":11650,"estimated":139.52017167381973,"download":true}
+          const { progress } = progressEvent
+          log(`下载进度：${(progress * 100).toFixed(2)}%`);
+        },
       })
 
       fs.writeFileSync(fileUrlAbs, response.data, 'binary')
