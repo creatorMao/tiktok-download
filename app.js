@@ -81,18 +81,20 @@ const initExpress = () => {
 }
 
 const initDataPath = () => {
+  log('正在初始化数据存放文件夹~');
   const fileSavePath = path.join(rootPath, dataPath)
   const { existFlag } = createDir(fileSavePath)
   if (existFlag) {
-    log('数据文件夹已存在，将跳过');
+    log('文件夹已存在，将跳过');
   }
   else {
-    log('数据文件夹初始化成功~');
+    log('文件夹初始化成功~');
   }
   log(`数据文件夹路径:${fileSavePath}`);
 }
 
 const init = async () => {
+  log('正在初始化~');
   initDataPath();
   await initDb(dbFilePath, createTableSqlList);
   startCronJob();
