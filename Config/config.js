@@ -2,7 +2,7 @@ import { generateRandomStr } from '../Helper/generatorHelper.js'
 import { downloadTypeOfUpdate, downloadTypeOfAll } from '../Service/const.js'
 const downloadType = downloadTypeOfUpdate
 const homeUrlPrefix = "https://www.douyin.com/user/"
-const retryCount = 5 //重试次数
+const retryCount = 3 //重试次数
 const checkDownloadCount = 6 //检查已下载数量跳过数
 const apiPort = 3000
 const dataPath = './Data/' //数据目录
