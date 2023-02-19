@@ -9,10 +9,10 @@ const getNowDate = (format = 'YYYY-MM-DD HH:mm:ss') => {
   return dayjs().format(format)
 }
 
-const delay = async (timeout) => {
+const delay = async (timeout, text = "") => {
+  log(`${text ? text + ' ' : ''}延迟${(timeout / 1000).toFixed(1)}秒~`)
   return new Promise((resolve) => {
     setTimeout(() => {
-      log(`延迟${(timeout / 1000).toFixed(1)}秒~`)
       resolve();
     }, timeout);
   })
