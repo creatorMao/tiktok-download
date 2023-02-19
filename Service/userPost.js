@@ -207,7 +207,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
     //api不是很稳定，有几率没有成功，所以会多尝试几次
     let count = currentRetryCount + 1
     if (currentRetryCount < retryCount) {
-      log(`正在进行第${count} 次获取`);
+      log(`正在进行第${count} 次重新获取`);
       await delay(delayTimeOut)
       return await downloadUserPost(secUserId, cursor, count, downloadStatus, downloadType);
     }
