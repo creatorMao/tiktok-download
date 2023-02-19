@@ -232,6 +232,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 
 const getUserInfo = async (secUserId) => {
   const { api } = await createApi(aweme, { secUserId, onePageCount: 1, cursor: 0 })
+  log(`正在获取用户信息~`)
   const postListResRaw = await requestWithRetry(() => {
     return request.get(api)
       .then((res) => {
@@ -263,13 +264,14 @@ const getUserInfo = async (secUserId) => {
 
   if (aweme_list && aweme_list.length > 0) {
     nickName = aweme_list[0].author.nickname
+    log(`获取到用户昵称：${nickName}`);
+
     const fileUri = aweme_list[0].author.avatar_thumb.uri.replaceAll('100x100/aweme-avatar/', '')
     const fileName = fileUri + ".jpeg"
     picPathFull = picPath + "/" + fileName
+    log(`正在保存用户头像`)
     const { api } = await createApi(awemeAvatar, { fileUri });
     await saveFile(api, picPath, fileName);
-
-    log(`获取到用户昵称：${nickName}`);
   }
   else {
     log('获取用户名称和头像失败~', errorLevel)

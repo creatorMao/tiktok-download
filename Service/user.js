@@ -65,7 +65,7 @@ const addUser = async (url) => {
 
     return {
       flag: true,
-      msg: '已成功添加！'
+      msg: '用户添加成功！'
     }
   }
 }
