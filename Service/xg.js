@@ -8,13 +8,13 @@ let count = 1
 const getXg = async (paramText) => {
   log(`准备开始获取xg参数，接口已使用${count}次`);
 
+  paramText = paramText.replaceAll('&', '%26')
+
   if (paramText == paramTextOld) {
     log('已在缓存中找到xg');
     log(`获取到xg:${xgOld}`);
     return xgOld
   }
-
-  paramText = paramText.replaceAll('&', '%26')
 
   //该逻辑来源于https://github.com/johnserf-seed/tiktokdownload,请支持原作者项目。
   //demo: http://47.115.200.238/xg/path/?url=aid=6383%26sec_user_id=xxx%26max_cursor=0%26count=10
