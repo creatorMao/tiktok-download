@@ -11,19 +11,19 @@ const getXg = async (paramText) => {
   //该逻辑来源于https://github.com/johnserf-seed/tiktokdownload,请支持原作者项目。
   //demo: http://47.115.200.238/xg/path/?url=aid=6383%26sec_user_id=xxx%26max_cursor=0%26count=10
   const url = `http://47.115.200.238/xg/path/?url=${paramText}`
-  log(`xg参数，url: ${url}`);
 
   let res = {}
   let xg = "";
 
   try {
-    res = await request.post(url).then((res) => {
+    res = await request.post(url, null, {
+      timeout: 5000
+    }).then((res) => {
       return res.data
-    }).catch((err) => {
-      log(`xg参数获取失败~原因: ${err}`);
     })
   }
   catch (e) {
+    log(`xg参数，url: ${url}`);
     log(`xg参数获取失败~原因: ${e.message}`);
   }
 
@@ -33,9 +33,8 @@ const getXg = async (paramText) => {
   if (result.length > 0) {
     xg = result[0]["X-Bogus"]["0"]
     log(`获取到xg:${xg}`);
+    count++
   }
-
-  count++
 
   return xg
 }
