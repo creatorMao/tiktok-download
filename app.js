@@ -71,7 +71,7 @@ const initExpress = () => {
   })
 
   app.listen(apiPort, () => {
-    log(`程序已启动，请访问http://localhost:${apiPort}/`)
+    log(`后台程序已启动，如想访问简易的web页面请访问http://localhost:${apiPort}/`)
   })
 
   process.on('SIGTERM', () => {
