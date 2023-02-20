@@ -81,7 +81,6 @@ const initExpress = () => {
 }
 
 const initDataPath = () => {
-  log('正在初始化数据存放文件夹~');
   const fileSavePath = path.join(rootPath, dataPath)
   const { existFlag } = createDir(fileSavePath)
   if (existFlag) {
