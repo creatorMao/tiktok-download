@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "task": "node task.js",
-    "test": "node test.js"
+    "test": "node ./Test/test.js"
   },
   "author": "",
   "license": "ISC",
