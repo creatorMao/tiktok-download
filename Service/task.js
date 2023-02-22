@@ -2,12 +2,12 @@ import { initDb } from '../Helper/dbHelper.js'
 import { createTableSqlList } from '../Config/createTable.js'
 import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
-import { dbFilePath, newsCenter, downloadType } from '../Config/config.js'
+import { dbFilePath, newsCenter } from '../Config/config.js'
 import { log, restartLog } from '../Helper/logHelper.js'
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
 import { getUserAwemeList } from '../Service/aweme.js'
-import { downloadTypeOfAll } from '../Service/const.js'
+import { downloadTypeOfAll, downloadTypeOfUpdate } from '../Service/const.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 import { getLatestTaskStatus, addTaskStatus } from './taskStatus.js'
 
@@ -18,7 +18,7 @@ const startTask = async (restartLogFlag = false) => {
   await initDb(dbFilePath, createTableSqlList);
 
   const userList = (await getUserList()).filter((item) => {
-    return (item.DOWNLOAD_FLAG == '1')
+    return (item.DOWNLOAD_FLAG != '0')
   });
   const total = userList.length
 
@@ -37,19 +37,26 @@ const startTask = async (restartLogFlag = false) => {
 
   log(`本次增量更新，预计将更新${total}个用户~`);
   for (let index = 0; index < total; index++) {
-    const nickName = userList[index]["NICK_NAME"]
-    log(`正在更新第${index + 1}个用户,用户名:【${nickName}】`)
     const user = userList[index]
+    const nickName = user["NICK_NAME"]
+    log(`正在更新第${index + 1}个用户,用户名:【${nickName}】`)
 
     let secUserId = user['SEC_USER_ID']
     const awemeList = await getUserAwemeList(secUserId);
 
-    let dlType = downloadType
-    if (awemeList.length == 0) {
-      dlType = downloadTypeOfAll //表里没有数据，直接全量
+    let downloadType = downloadTypeOfAll
+    switch (user["DOWNLOAD_FLAG"] + "") {
+      case "1":
+        downloadType = downloadTypeOfAll
+        log('该用户进行全量下载');
+        break;
+      case "2":
+        downloadType = downloadTypeOfUpdate
+        log('该用户进行增量下载');
+        break;
     }
 
-    const status = await downloadUserPost(secUserId, undefined, undefined, undefined, dlType);
+    const status = await downloadUserPost(secUserId, undefined, undefined, undefined, downloadType);
 
     log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，异常图片${status.photoFailCount}张,异常视频${status.videoFailCount}个,耗时${status.downloadTimeCost}秒~`)
 
