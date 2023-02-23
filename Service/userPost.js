@@ -299,14 +299,27 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
 
   const resList = []
 
-  const pictureResRaw = await request.get(api)
-    .then((res) => {
-      return res.data
-    })
-    .catch((err) => {
-      log(err);
-    })
-  const { images } = pictureResRaw.aweme_detail
+  const pictureResRaw = await requestWithRetry(() => {
+    return request.get(api)
+      .then((res) => {
+        // log(JSON.stringify(res.data));
+        return res.data
+      })
+      .catch((err) => {
+        log(err);
+      })
+  }, (requestRes) => {
+    if (!requestRes.aweme_detail) {
+      return false
+    }
+    return true
+  })
+
+  let { images } = (pictureResRaw.aweme_detail) || {}
+
+  if (!images) {
+    images = []
+  }
 
   for (let index = 0; index < images.length; index++) {
     const { url_list, uri = "" } = images[index]
