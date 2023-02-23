@@ -10,6 +10,7 @@ import { getUserAwemeList } from '../Service/aweme.js'
 import { downloadTypeOfAll, downloadTypeOfUpdate } from '../Service/const.js'
 import { createGuid } from '../Helper/generatorHelper.js'
 import { getLatestTaskStatus, addTaskStatus } from './taskStatus.js'
+import { updateUserDownloadFlag } from '../Service/user.js'
 
 const startTask = async (restartLogFlag = false) => {
   if (restartLogFlag) {
@@ -57,6 +58,12 @@ const startTask = async (restartLogFlag = false) => {
     }
 
     const status = await downloadUserPost(secUserId, undefined, undefined, undefined, downloadType);
+
+    //如果用户之前下载状态是全量的，本次下载有数据，那么下次将是增量下载
+    if (downloadType == downloadTypeOfAll && (status.videoCount + status.photoCount) > 0) {
+      log('修改用户的下一次的下载方式，调成为增量下载');
+      updateUserDownloadFlag(secUserId, '2')
+    }
 
     log(`第${index + 1}个用户更新完毕~下载了${status.videoCount}个视频,${status.photoCount}张图片，异常图片${status.photoFailCount}张,异常视频${status.videoFailCount}个,耗时${status.downloadTimeCost}秒~`)
 

@@ -70,7 +70,22 @@ const addUser = async (url) => {
   }
 }
 
+const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
+  let sql = `UPDATE USER SET DOWNLOAD_FLAG=$DOWNLOAD_FLAG WHERE SEC_USER_ID=$SEC_USER_ID`
+
+  await runSql(sql, {
+    $SEC_USER_ID: secUserId,
+    $DOWNLOAD_FLAG: downloadFlag
+  });
+
+  return {
+    flag: true,
+    msg: '修改下载状态成功'
+  }
+}
+
 export {
   addUser,
-  getUserList
+  getUserList,
+  updateUserDownloadFlag
 }
