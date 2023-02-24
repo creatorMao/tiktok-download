@@ -1,7 +1,7 @@
 import express from 'express'
 import { apiPort, dbFilePath, dataPath } from './Config/config.js'
 import { getParam } from './Helper/httpHelper.js'
-import { addUser } from './Service/user.js'
+import { addUser, updateUserDownloadFlag } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { createTableSqlList } from './Config/createTable.js'
@@ -48,6 +48,15 @@ const initExpress = () => {
     }
 
     const { msg } = await addUser(url);
+    log(msg)
+    res.send(Ok(msg));
+  })
+
+  app.post('/user/downloadflag', async function (req, res) {
+    log('请求到修改用户下载状态接口')
+    const secUserId = getParam(req, 'secUserId')
+    const downloadFlag = getParam(req, 'downloadFlag')
+    const { msg } = await updateUserDownloadFlag(secUserId, downloadFlag);
     log(msg)
     res.send(Ok(msg));
   })

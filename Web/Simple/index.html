@@ -61,27 +61,37 @@
         <textarea id="text" name="" id="" cols="30" rows="10" placeholder="复制用户主页短链/长链到此输入框,是主页链接！！！！！不是视频链接！！！！"></textarea>
       </div>
       <div>
-        功能1
-        <button onclick="add()" id="add">将输入框里的用户添加到下载队列</button>
-        <button onclick="copyAndAdd()">一键粘贴+添加(不支持safari)</button>
         <button onclick="reset()" id="reset">清空输入框</button>
+      </div>
+      <div>
+        功能1-将输入框里的用户添加到下载队列
+        <button onclick="add()" id="add">添加</button>
+        <button onclick="copyAndAdd()">一键粘贴+添加(不支持safari)</button>
       </div>
       <div>
         ---------------------------------
       </div>
       <div class="button">
-        功能2
-        <button onclick="startUpdate('desc')">启动下载(倒序)</button>
-        <button onclick="startUpdate('asc')">启动下载(正序)</button>
-        <button onclick="closeServer()">停止服务</button>
+        功能2-启动下载
+        <button onclick="startUpdate('desc')">列表倒序</button>
+        <button onclick="startUpdate('asc')">列表正序</button>
       </div>
       <div>
         ---------------------------------
       </div>
-      <!-- <div>
-        日志
-        <button onclick="resetMessage()">清空</button>
-      </div> -->
+      <div class="button">
+        功能3-设置所有用户的下载方式
+        <button onclick="updateUserDownloadFlag('','0')">都不下载</button>
+        <button onclick="updateUserDownloadFlag('','2')">增量下载</button>
+        <button onclick="updateUserDownloadFlag('','1')">全量下载</button>
+      </div>
+      <div>
+        ---------------------------------
+      </div>
+      <div class="button">
+        功能4-服务
+        <button onclick="closeServer()">停止</button>
+      </div>
     </div>
     <div class="bottom">
       <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
@@ -204,6 +214,21 @@
     catch (e) {
       printMessage(e.message)
     }
+  }
+
+  const updateUserDownloadFlag=async (secUserId,downloadFlag)=>{
+    const { data } = await axios({
+        method: 'post',
+        url: '/user/downloadflag',
+        data:{
+          secUserId,
+          downloadFlag
+        }
+      }).then((res) => {
+        return res.data
+      }).catch(res => {
+      }).finally((res) => {
+      });
   }
 </script>
 

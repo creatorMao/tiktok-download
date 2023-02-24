@@ -71,12 +71,20 @@ const addUser = async (url) => {
 }
 
 const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
-  let sql = `UPDATE USER SET DOWNLOAD_FLAG=$DOWNLOAD_FLAG WHERE SEC_USER_ID=$SEC_USER_ID`
-
-  await runSql(sql, {
-    $SEC_USER_ID: secUserId,
+  let sql = `UPDATE USER SET DOWNLOAD_FLAG=$DOWNLOAD_FLAG`
+  let param = {
     $DOWNLOAD_FLAG: downloadFlag
-  });
+  }
+
+  if (secUserId) {
+    sql += ` WHERE SEC_USER_ID=$SEC_USER_ID`
+    param[$SEC_USER_ID] = secUserId
+  }
+  else {
+
+  }
+
+  await runSql(sql, param);
 
   return {
     flag: true,

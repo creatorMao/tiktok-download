@@ -16,7 +16,9 @@ const getParam = (req, key) => {
     bodyRes = req.body[key]
   }
 
-  return queryRes || bodyRes || ""
+  let res = queryRes || bodyRes || "";
+  log(`获取到参数:${key},参数值:${res}`)
+  return res
 }
 
 const requestWithRetry = async (requestFunction, checkResultFunction, currentRetryCount = 0) => {
