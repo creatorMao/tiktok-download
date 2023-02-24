@@ -57,7 +57,8 @@ const initExpress = () => {
   })
 
   app.get('/task/start', async function (req, res) {
-    startTask()
+    const sort = getParam(req, 'sort')
+    startTask(undefined, sort)
     res.send(Ok('已启动~'))
   })
 

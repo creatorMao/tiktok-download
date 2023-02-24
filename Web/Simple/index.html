@@ -71,7 +71,8 @@
       </div>
       <div class="button">
         功能2
-        <button onclick="startUpdate()">启动增量更新</button>
+        <button onclick="startUpdate('desc')">启动下载(倒序)</button>
+        <button onclick="startUpdate('asc')">启动下载(正序)</button>
         <button onclick="closeServer()">停止服务</button>
       </div>
       <div>
@@ -183,13 +184,13 @@
     }, 2000)
   }
   getServerLog();
-  const startUpdate = async () => {
+  const startUpdate = async (sort) => {
     resetMessage();
 
     try {
       const msg = await axios({
         method: 'get',
-        url: '/task/start',
+        url:  `/task/start?sort=${sort}`,
       }).then((res) => {
         const { msg = "" } = res.data
         return msg

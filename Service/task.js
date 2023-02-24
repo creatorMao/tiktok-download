@@ -12,15 +12,21 @@ import { createGuid } from '../Helper/generatorHelper.js'
 import { getLatestTaskStatus, addTaskStatus } from './taskStatus.js'
 import { updateUserDownloadFlag } from '../Service/user.js'
 
-const startTask = async (restartLogFlag = false) => {
+const startTask = async (restartLogFlag = false, sort = "desc") => {
+  log(`当前下载队列为${sort == "asc" ? '正' : '倒'}序`)
   if (restartLogFlag) {
     restartLog()
   }
   await initDb(dbFilePath, createTableSqlList);
 
-  const userList = (await getUserList()).filter((item) => {
+  let userList = (await getUserList()).filter((item) => {
     return (item.DOWNLOAD_FLAG != '0')
   });
+
+  if (sort == "asc") {
+    userList = userList.reverse()
+  }
+
   const total = userList.length
 
   const taskStatus = {

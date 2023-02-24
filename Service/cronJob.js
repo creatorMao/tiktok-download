@@ -9,7 +9,7 @@ const startCronJob = () => {
     let job = new CronJob(
       cronJobTime,
       () => {
-        startTask(true)
+        startTask(true, "asc")
       },
       null,
       true
