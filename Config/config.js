@@ -1,6 +1,6 @@
 import { generateRandomStr } from '../Helper/generatorHelper.js'
 const homeUrlPrefix = "https://www.douyin.com/user/"
-const retryCount = 3 //重试次数
+const retryCount = 4 //重试次数
 const checkDownloadCount = 6 //检查已下载数量跳过数
 const apiPort = 3000
 const dataPath = './Data/' //数据目录
