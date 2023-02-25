@@ -58,7 +58,39 @@ const createTableSqlList = [
   }
 ]
 
+const createIndexSqlList = [
+  {
+    idxName: 'IDX_AWEME_ID',
+    tableCode: 'AWEME',
+    tableName: '作品表',
+    sql: `
+    CREATE UNIQUE INDEX 'IDX_AWEME_ID' ON 'AWEME' ( 'AWEME_ID', 'AWEME_FILE_URL' )
+    `
+  },
+  {
+    idxName: 'IDX_AWEME_SEC_USER_ID',
+    tableCode: 'AWEME',
+    tableName: '作品表',
+    sql: `
+    CREATE INDEX 'IDX_AWEME_SEC_USER_ID' ON 'AWEME' ( 'SEC_USER_ID' )
+    `
+  },
+  {
+    idxName: 'IDX_USER_SEC_USER_ID',
+    tableCode: 'USER',
+    tableName: '用户表',
+    sql: `
+    CREATE UNIQUE INDEX 'IDX_USER_SEC_USER_ID' ON 'USER' ( 'SEC_USER_ID' )
+    `
+  },
+]
+
+const sqlList = {
+  createTableSqlList,
+  createIndexSqlList
+}
+
 
 export {
-  createTableSqlList
+  sqlList
 }

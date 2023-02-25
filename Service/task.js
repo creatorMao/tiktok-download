@@ -1,5 +1,5 @@
 import { initDb } from '../Helper/dbHelper.js'
-import { createTableSqlList } from '../Config/createTable.js'
+import { sqlList } from '../Config/sql.js'
 import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
 import { dbFilePath, newsCenter } from '../Config/config.js'
@@ -17,7 +17,7 @@ const startTask = async (restartLogFlag = false, sort = "desc") => {
   if (restartLogFlag) {
     restartLog()
   }
-  await initDb(dbFilePath, createTableSqlList);
+  await initDb(dbFilePath, sqlList);
 
   let userList = (await getUserList()).filter((item) => {
     return (item.DOWNLOAD_FLAG != '0')

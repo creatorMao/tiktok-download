@@ -4,7 +4,7 @@ import { getParam } from './Helper/httpHelper.js'
 import { addUser, updateUserDownloadFlag } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
-import { createTableSqlList } from './Config/createTable.js'
+import { sqlList } from './Config/sql.js'
 import { rootPath, createDir } from './Helper/fsHelper.js'
 import path from 'path'
 import { log, logData } from './Helper/logHelper.js'
@@ -105,7 +105,7 @@ const initDataPath = () => {
 const init = async () => {
   log('正在初始化~');
   initDataPath();
-  await initDb(dbFilePath, createTableSqlList);
+  await initDb(dbFilePath, sqlList);
   startCronJob();
   initExpress();
 }

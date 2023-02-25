@@ -3,7 +3,7 @@ import { log, logLevel } from './logHelper.js'
 const { errorLevel } = logLevel
 let currentDb = null;
 
-const initDb = async (dbFilePath, createTableSqlList) => {
+const initDb = async (dbFilePath, { createTableSqlList, createIndexSqlList }) => {
   if (currentDb) {
     return currentDb
   }
@@ -13,10 +13,22 @@ const initDb = async (dbFilePath, createTableSqlList) => {
   log('数据库连接成功');
 
   log('正在初始化数据库');
+
+  log('正在初始化表');
   for (let i = 0; i < createTableSqlList.length; i++) {
     let table = createTableSqlList[i];
     await createTable(table.tableCode, table.tableName, table.sql);
   }
+  log('初始化表成功');
+
+  log('正在初始化索引');
+  for (let i = 0; i < createIndexSqlList.length; i++) {
+    let indexInfo = createIndexSqlList[i]
+    log(`正在创建索引:${indexInfo.idxName}`);
+    await runSql(indexInfo.sql)
+  }
+  log('初始化索引成功');
+
   log('数据库初始化成功');
   currentDb = db
   return db;
