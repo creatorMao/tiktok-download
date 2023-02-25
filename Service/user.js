@@ -78,7 +78,7 @@ const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
 
   if (secUserId) {
     sql += ` WHERE SEC_USER_ID=$SEC_USER_ID`
-    param[$SEC_USER_ID] = secUserId
+    param['$SEC_USER_ID'] = secUserId
   }
   else {
 
