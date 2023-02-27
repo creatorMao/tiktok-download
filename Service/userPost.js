@@ -118,7 +118,9 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
       break
     }
 
-    const { aweme_type, aweme_id, video = {}, desc = "", create_time = "", is_top = 0 } = aweme_list[index]
+    let awemeItem = aweme_list[index]
+
+    const { aweme_type, aweme_id, video = {}, desc = "", create_time = "", is_top = 0 } = awemeItem
 
     const path = dataPath + secUserId  //以user_sec_id为文件夹名
     let downloadRes = []
@@ -144,7 +146,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         //除了68，其他统一先按视频下载
         log(`${cursor}页，第${index + 1}个作品是的类型是${aweme_type},统一按视频处理~`);
         awemeType = videoType
-        downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+        if (video.play_addr) {
+          downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+        }
+        else {
+          log(`该作品格式异常${JSON.stringify(awemeItem)}`, errorLevel)
+        }
         break;
     }
 
