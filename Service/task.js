@@ -3,7 +3,8 @@ import { sqlList } from '../Config/sql.js'
 import { getUserList } from './user.js'
 import { getSecUserIdFromShortUrl, downloadUserPost } from './userPost.js'
 import { dbFilePath, newsCenter } from '../Config/config.js'
-import { log, restartLog } from '../Helper/logHelper.js'
+import { log, restartLog, logLevel } from '../Helper/logHelper.js'
+const { errorLevel } = logLevel
 import { request } from '../Helper/httpHelper.js'
 import { getNowDate } from '../Helper/dateHelper.js'
 import { getUserAwemeList } from '../Service/aweme.js'
@@ -44,6 +45,8 @@ const startTask = async (restartLogFlag = false, sort = "desc") => {
 
   log(`本次增量更新，预计将更新${total}个用户~`);
   for (let index = 0; index < total; index++) {
+    await recordTaskStatus(taskStatus)
+
     const user = userList[index]
     const nickName = user["NICK_NAME"]
     log(`正在更新第${index + 1}个用户,用户名:【${nickName}】`)
@@ -81,34 +84,38 @@ const startTask = async (restartLogFlag = false, sort = "desc") => {
     taskStatus.PHOTO_FAIL_COUNT += status.photoFailCount
     taskStatus.VIDEO_FAIL_COUNT += status.videoFailCount
     taskStatus.FAIL_TOTAL = taskStatus.PHOTO_FAIL_COUNT + taskStatus.VIDEO_FAIL_COUNT
-
-    await addTaskStatus(taskStatus)
-    const latestTaskStatus = await getLatestTaskStatus()
-    if (latestTaskStatus.ID) {
-      await sendTaskStatus({ ...latestTaskStatus });
-    }
   }
 
   log(`本次增量更新更新完毕，下载了${taskStatus.VIDEO_COUNT}个视频,${taskStatus.PHOTO_COUNT}张图片,异常图片${taskStatus.PHOTO_FAIL_COUNT}张,异常视频${taskStatus.VIDEO_FAIL_COUNT}个,耗时${taskStatus.DOWNLOAD_TIME_COST}秒~`);
+
+  await recordTaskStatus(taskStatus)
 }
 
+const recordTaskStatus = async (taskStatus) => {
+  await addTaskStatus(taskStatus)
+  const latestTaskStatus = await getLatestTaskStatus()
+  if (latestTaskStatus.ID) {
+    await sendTaskStatusToNewsCenter({ ...latestTaskStatus });
+  }
+}
 
-const sendTaskStatus = async (taskStatus) => {
+const sendTaskStatusToNewsCenter = async (taskStatus) => {
   const { groupId, url } = newsCenter
   if (url) {
-    request({
-      method: 'post',
-      url,
-      params: {
-        groupId,
-        content: JSON.stringify(taskStatus)
-      }
-    }).then((res) => {
+    try {
+      await request({
+        method: 'post',
+        url,
+        params: {
+          groupId,
+          content: JSON.stringify(taskStatus)
+        }
+      })
       log('下载状态发送成功！');
-    }).catch(res => {
-      log('下载状态发送失败');
-    }).finally(() => {
-    });
+    }
+    catch (e) {
+      log('下载状态发送失败', errorLevel);
+    }
   }
   else {
     log('未配置信息中心，下载状态暂时不发送！');
