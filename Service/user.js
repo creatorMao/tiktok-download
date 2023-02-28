@@ -70,6 +70,7 @@ const addUser = async (url) => {
   }
 }
 
+// DOWNLOAD_FLAG 0:不下载 1：全量下载 2：增量下载
 const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
   let sql = `UPDATE USER SET DOWNLOAD_FLAG=$DOWNLOAD_FLAG`
   let param = {
