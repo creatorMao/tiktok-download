@@ -151,6 +151,7 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         }
         else {
           log(`该作品格式异常${JSON.stringify(awemeItem)}`, errorLevel)
+          downloadStatus.videoCount++
         }
         break;
     }
