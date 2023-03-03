@@ -2,6 +2,7 @@ import axios from 'axios'
 import { headers, retryCount, delayTimeOut } from '../Config/config.js'
 import { log } from './logHelper.js'
 import { delay } from './dateHelper.js'
+
 const request = axios.create({ headers });
 
 const getParam = (req, key) => {
@@ -45,25 +46,8 @@ const requestWithRetry = async (requestFunction, checkResultFunction, currentRet
   return res || {}
 }
 
-// [
-//   [
-//     'key',
-//     'value'
-//   ],
-//   [
-//     'key',
-//     'value'
-//   ]
-// ]
-const createCookieString = (list) => {
-  return list.map(item => {
-    return `${item[0]}=${item[1]};`
-  }).join('')
-}
-
 export {
   requestWithRetry,
   request,
-  getParam,
-  createCookieString
+  getParam
 }

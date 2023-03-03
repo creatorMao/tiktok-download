@@ -1,5 +1,5 @@
 import { generateRandomStr } from '../Helper/generatorHelper.js'
-import { createCookieString } from '../Helper/httpHelper.js'
+import { createCookieString, parseCookieStringToList } from '../Helper/generatorHelper.js'
 const homeUrlPrefix = "https://www.douyin.com/user/"
 const retryCount = 5 //重试次数
 const checkDownloadCount = 5 //检查已下载数量跳过数
@@ -16,11 +16,7 @@ const cronJobTime = "1 1 10,16,22 * * *" //每天上午10点1秒、下午4点1�
 const headers = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36',
   'referer': 'https://www.douyin.com/',
-  'cookie': createCookieString([
-    ['msToken', `${generateRandomStr(107)}`],
-    ['ttwid', ''],
-    ['odin_tt', '']
-  ])
+  'cookie': createCookieString(parseCookieStringToList(`将cookie复制到此位置`))
 }
 
 const delayTimeOut = 1000

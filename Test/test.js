@@ -83,7 +83,7 @@
 // console.log(urlObj)
 // console.log(removeQueryParam(urlText));
 
-import { createCookieString } from '../Helper/httpHelper.js'
+import { createCookieString } from '../Helper/generatorHelper.js'
 
 console.log(createCookieString([
   ['1', '2'],

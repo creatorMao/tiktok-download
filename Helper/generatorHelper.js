@@ -27,9 +27,38 @@ const generateRandomStr = (randomlength = 16) => {
   return text
 }
 
+// [
+//   [
+//     'key',
+//     'value'
+//   ],
+//   [
+//     'key',
+//     'value'
+//   ]
+// ]
+const createCookieString = (list) => {
+  return list.map(item => {
+    return `${item[0]}=${item[1]};`
+  }).join('')
+}
+
+const parseCookieStringToList = (string) => {
+  return string.split(';').map((item) => {
+    let str = item.replaceAll(' ', '')
+    let index = str.indexOf('=')
+    return [
+      str.substr(0, index),
+      str.substr(index + 1)
+    ]
+  })
+}
+
 export {
   generateRandomStr,
   createGuid,
   generateToken,
-  getDecryptToken
+  getDecryptToken,
+  createCookieString,
+  parseCookieStringToList
 }
