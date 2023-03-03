@@ -75,10 +75,18 @@
 // console.log(2)
 
 
-import url from 'url'
-import { removeQueryParam } from './Helper/urlHelper.js'
-let urlText = "https://www.douyin.com/user/MS4wLjABAAAA8wxawYDUArgcTYVlqVW1lmzNnP8VGWXXa1YZctg9xfI"
-const urlObj = url.parse(urlText)
-console.log(urlObj.path)
-console.log(urlObj)
-console.log(removeQueryParam(urlText));
+// import url from 'url'
+// import { removeQueryParam } from './Helper/urlHelper.js'
+// let urlText = "https://www.douyin.com/user/MS4wLjABAAAA8wxawYDUArgcTYVlqVW1lmzNnP8VGWXXa1YZctg9xfI"
+// const urlObj = url.parse(urlText)
+// console.log(urlObj.path)
+// console.log(urlObj)
+// console.log(removeQueryParam(urlText));
+
+import { createCookieString } from '../Helper/httpHelper.js'
+
+console.log(createCookieString([
+  ['1', '2'],
+  ['4', '5'],
+  ['3', '4']
+]))

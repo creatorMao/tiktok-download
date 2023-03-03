@@ -45,8 +45,25 @@ const requestWithRetry = async (requestFunction, checkResultFunction, currentRet
   return res || {}
 }
 
+// [
+//   [
+//     'key',
+//     'value'
+//   ],
+//   [
+//     'key',
+//     'value'
+//   ]
+// ]
+const createCookieString = (list) => {
+  return list.map(item => {
+    return `${item[0]}=${item[1]};`
+  }).join('')
+}
+
 export {
   requestWithRetry,
   request,
-  getParam
+  getParam,
+  createCookieString
 }
