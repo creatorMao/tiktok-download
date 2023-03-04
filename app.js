@@ -1,7 +1,7 @@
 import express from 'express'
 import { apiPort, dbFilePath, dataPath } from './Config/config.js'
 import { getParam } from './Helper/httpHelper.js'
-import { addUser, updateUserDownloadFlag } from './Service/user.js'
+import { addUser, updateUserDownloadFlag, getUserList } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { sqlList } from './Config/sql.js'
@@ -39,6 +39,10 @@ const initExpress = () => {
     res.sendFile(path.join(rootPath, './Web/Simple/index.html'))
   })
 
+  app.get('/user', async function (req, res) {
+    res.sendFile(path.join(rootPath, './Web/Simple/user.html'))
+  })
+
   app.post('/user/add', async function (req, res) {
     const url = getParam(req, 'url')
     log(`获取到url参数：${url}`)
@@ -50,6 +54,16 @@ const initExpress = () => {
     const { msg } = await addUser(url);
     log(msg)
     res.send(Ok(msg));
+  })
+
+  app.post('/user/search', async function (req, res) {
+    const keyword = getParam(req, 'keyword')
+    if (!keyword) {
+      res.send(err('请填写keyword参数！'));
+      return
+    }
+
+    res.send(Ok('', await getUserList(keyword)));
   })
 
   app.post('/user/downloadflag', async function (req, res) {

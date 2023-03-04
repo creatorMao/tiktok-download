@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+  <title>tiktok-download</title>
+  <style>
+    html,
+    body,
+    .container {
+      height: 100%;
+    }
+
+    * {
+      margin: 0px;
+      padding: 0px;
+      font-size: 16px;
+    }
+
+    .container {
+      width: 90vw;
+      margin-left: 5vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #text {
+      width: 90vw;
+      height: 7vh;
+      margin-top: 10px;
+    }
+
+    #search {
+      margin-top: 10px;
+    }
+
+    #res {
+      width: 90vw;
+      height: calc(100% - 10px);
+    }
+
+    .button {
+      margin-bottom: 5px;
+    }
+
+    .bottom {
+      flex: 1;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <a href="/">返回首页</a>
+      </div>
+      <div>
+        <textarea id="text" name="" id="" cols="30" rows="10" placeholder="请输入用户昵称"></textarea>
+      </div>
+      <div>
+        功能1
+        <button onclick="search()" id="search">搜索</button>
+      </div>
+    </div>
+    <div class="bottom">
+      <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
+    </div>
+  </div>
+</body>
+<script>
+  const search = () => {
+    const keyword = (document.querySelector('#text').value).trim()
+
+    if (!keyword) {
+      alert('任何人不填写就搜我会伤心的ok！');
+      return
+    }
+
+    axios({
+      method: 'post',
+      url: '/user/search',
+      params: {
+        keyword,
+      }
+    }).then((res) => {
+      const { msg = "",data } = res.data
+      let message=data.map((item)=>{
+        return `${item.NICK_NAME}      ${item.SEC_USER_ID}`
+      }).join(' \n')
+      printMessage(`一共搜索到${data.length}个用户\n`,true)
+      printMessage(message)
+    }).catch(res => {
+      printMessage('搜索错误',true)
+    }).finally((res) => {
+      document.querySelector('#text').value=''
+    });
+  }
+  
+  const printMessage = (message, clearAll) => {
+    const preValue = document.querySelector('#res').value
+    if (clearAll) {
+      document.querySelector('#res').value = message
+    }
+    else {
+      document.querySelector('#res').value = preValue + message + "\n"
+    }
+
+    var textarea = document.querySelector('#res');
+    textarea.scrollTop = textarea.scrollHeight;
+  }
+
+  document.onkeydown=(e)=> {  
+        // 兼容FF和IE和Opera  
+        var theEvent = e || window.event;  
+        var code = theEvent.keyCode || theEvent.which || theEvent.charCode;  
+        if (code == 13) {  
+          search()
+            return false;  
+        }  
+        return true;  
+    }
+</script>
+
+</html>

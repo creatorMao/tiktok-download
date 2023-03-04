@@ -5,8 +5,17 @@ import { homeUrlPrefix } from '../Config/config.js'
 import { log } from '../Helper/logHelper.js'
 import { removeQueryParam } from '../Helper/urlHelper.js'
 
-const getUserList = async () => {
-  return await getRowsBySql('SELECT * FROM USER order by imp_time desc');
+const getUserList = async (searchKeyword) => {
+  let sql = 'SELECT * FROM USER'
+  let param = {}
+
+  if (searchKeyword) {
+    sql += ` where NICK_NAME LIKE $searchKeyword`;
+    param['$searchKeyword'] = `%${searchKeyword}%`
+  }
+
+  sql += ' order by imp_time desc'
+  return await getRowsBySql(sql, param);
 }
 
 const getUserDetail = async (secUserId) => {
