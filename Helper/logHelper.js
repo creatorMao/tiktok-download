@@ -5,7 +5,7 @@ import { createDir, rootPath } from './fsHelper.js'
 import { getNowDate } from './dateHelper.js'
 
 let currentLogFileName = ""; //当前日志文件名
-let logData = undefined //当前日志数据
+let logData = [] //当前日志数据
 let currentLogPath = "" //当前日志目录
 
 const restartLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
@@ -14,7 +14,7 @@ const restartLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
   currentLogPath = path.join(pathPrefix, `./${getNowDate('YYYY-MM-DD')}`)
   createDir(currentLogPath)
   currentLogFileName = `${fileName}.txt`;
-  logData = ""
+  logData = []
 }
 
 const getLogLevelText = (logLevel) => {
@@ -42,7 +42,7 @@ const log = (logText, logLevel) => {
     logText += "\n"
     fs.appendFileSync(path.join(currentLogPath, "/" + currentLogFileName), logText, 'utf8');
 
-    logData += logText
+    logData.push(logText)
   }
 }
 
@@ -50,7 +50,21 @@ const logLevel = {
   errorLevel: 'error'
 }
 
+const getLogData = (countLimit) => {
+  if (countLimit) {
+    let logLength = logData.length
+    if (logLength < countLimit) {
+      return logData
+    }
+    else {
+      return logData.slice(logLength - countLimit)
+    }
+  }
+  return logData
+}
+
 export {
+  getLogData,
   logData,
   restartLog,
   log,

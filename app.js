@@ -7,7 +7,7 @@ import { initDb } from './Helper/dbHelper.js'
 import { sqlList } from './Config/sql.js'
 import { rootPath, createDir } from './Helper/fsHelper.js'
 import path from 'path'
-import { log, logData } from './Helper/logHelper.js'
+import { log, getLogData } from './Helper/logHelper.js'
 import { startTask } from './Service/task.js'
 import { getLatestTaskStatus } from './Service/taskStatus.js'
 import { startCronJob } from './Service/cronJob.js'
@@ -62,7 +62,7 @@ const initExpress = () => {
   })
 
   app.get('/log/latest', async function (req, res) {
-    res.send(Ok('日志获取成功~', logData))
+    res.send(Ok('日志获取成功~', getLogData(300).join('')))
   })
 
   app.get('/task/start', async function (req, res) {
