@@ -1,13 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic DataGrid - jQuery EasyUI Demo</title>
+  <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+  <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+  <script src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+  <script src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
   <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-  <title>tiktok-download</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .bottom {
+      flex: 1;
+      box-sizing: border-box;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
     html,
     body,
     .container {
@@ -21,35 +36,38 @@
     }
 
     .container {
-      width: 90vw;
-      margin-left: 5vw;
       display: flex;
       flex-direction: column;
     }
 
-    #text {
-      width: 90vw;
-      height: 7vh;
-      margin-top: 10px;
+    .top {
+      min-height: 60px;
     }
 
-    #search {
-      margin-top: 10px;
+
+
+    .table-container {
+      flex: 1
     }
 
-    #res {
-      width: 90vw;
-      height: calc(100% - 10px);
+    .bottom>.datagrid {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    .button {
-      margin-bottom: 5px;
-    }
-
-    .bottom {
+    .bottom>.datagrid>.datagrid-wrap {
       flex: 1;
-      box-sizing: border-box;
-      margin-top: 10px;
+    }
+
+    .datagrid-view2 {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .datagrid-view2 .datagrid-body {
+      flex: 1
     }
   </style>
 </head>
@@ -60,28 +78,113 @@
       <div>
         <a href="/">返回首页</a>
       </div>
-      <div>
-        <textarea id="text" name="" id="" cols="30" rows="10" placeholder="请输入用户昵称"></textarea>
-      </div>
-      <div>
-        功能1
-        <button onclick="search()" id="search">搜索</button>
+      <input id="text" placeholder="请输入用户昵称"></input>
+      <button onclick="search()" id="search">搜索</button>
+      <div class="button">
+        设置所有用户的下载方式
+        <button onclick="updateUserDownloadFlag('','0')">都不下载</button>
+        <button onclick="updateUserDownloadFlag('','2')">增量下载</button>
+        <button onclick="updateUserDownloadFlag('','1')">全量下载</button>
       </div>
     </div>
     <div class="bottom">
-      <textarea id="res" name="" id="" cols="30" rows="10"></textarea>
+      <table id="grid" class="easyui-datagrid table-container">
+      </table>
+      <div id="pagination" class="easyui-pagination" style="background:#efefef;border:1px solid #ccc;"
+        data-options="total:2000,pageSize:10">
+      </div>
     </div>
   </div>
 </body>
 <script>
+  const initGrid = () => {
+    $('#grid').datagrid({
+      title: '已添加用户列表',
+      singleSelect: true,
+      columns: [[
+        {field: 'RN', title: '序号', width: '50px', align: 'center'},
+        // { field: 'ID', title: '数据记录ID', width: '10%', align: 'center' },
+        { field: 'SEC_USER_ID', title: '官方用户ID', width: '30%', align: 'center' },
+        { field: 'NICK_NAME', title: '昵称', width: '10%', align: 'center' },
+        {
+          field: 'USER_PIC', title: '用户头像地址', width: '10%', align: 'center', formatter: function (value, row, index) {
+            return `<img style='width:50px;border-radius:50%' src='./asset?url=${value}'>`
+          }
+        },
+        {
+          field: 'HOME_SHORT_URL', title: '用户主页链接', width: '10%', align: 'center',
+        },
+        {
+          field: 'DOWNLOAD_FLAG', title: '下载模式', width: '10%', align: 'center', formatter: function (value, row, index) {
+            let res = ''
+            switch (value + '') {
+              case '0':
+                res = '不下载'
+                break;
+              case '1':
+                res = '全量下载'
+                break;
+              case '2':
+                res = '增量下载'
+                break;
+            }
+            return res
+          }
+        },
+        { field: 'IMP_DATE', title: '插入日期', width: '10%', align: 'center' },
+        { field: 'IMP_TIME', title: '插入时间', width: '10%', align: 'center' }
+      ]]
+    });
+
+    $('#pagination').pagination({
+      pageList: [10,15],
+      layout:['list','first','prev','manual','next','last','info'],
+      displayMsg: '当前无数据',
+      onSelectPage:function(pageNumber, pageSize){
+        console.log(pageNumber, pageSize);
+        console.log(window.gvData);
+        pageNumber--
+        let start=pageSize*pageNumber
+        let end= pageSize+pageSize*pageNumber
+        console.log(start,end);
+        $('#grid').datagrid('loadData', window.gvData.slice(start,end).map((item,index)=>{
+          return {
+            ...item,
+            RN:start+(index+1)
+          }
+        }))
+      },
+      onRefresh:function(pageNumber, pageSize){
+        
+      }
+    });
+  }
+
+  const loadData = (data) => {
+    window.gvData=data
+
+    $('#pagination').pagination({
+      total:data.length,
+      displayMsg: `总共${data.length}条数据`
+    });
+    $('#pagination').pagination('select', 1);	
+
+    setTimeout(() => {
+      $('.bottom>.datagrid>.datagrid-wrap>.datagrid-view').css({
+        overflow: 'auto',
+        height: '100%'
+      })
+
+      $('.datagrid-view2 .datagrid-body').css({
+        height: 'initial'
+      })
+    }, 0);
+    $('#grid').datagrid('loaded')
+  }
+
   const search = () => {
     const keyword = (document.querySelector('#text').value).trim()
-
-    if (!keyword) {
-      alert('任何人不填写就搜我会伤心的ok！');
-      return
-    }
-
+    $('#grid').datagrid('loading')
     axios({
       method: 'post',
       url: '/user/search',
@@ -89,42 +192,43 @@
         keyword,
       }
     }).then((res) => {
-      const { msg = "",data } = res.data
-      let message=data.map((item)=>{
-        return `${item.NICK_NAME}      ${item.SEC_USER_ID}`
-      }).join(' \n')
-      printMessage(`一共搜索到${data.length}个用户\n`,true)
-      printMessage(message)
+      const { msg = "", data } = res.data
+      loadData(data)
     }).catch(res => {
-      printMessage('搜索错误',true)
     }).finally((res) => {
-      document.querySelector('#text').value=''
+      document.querySelector('#text').value = ''
     });
   }
-  
-  const printMessage = (message, clearAll) => {
-    const preValue = document.querySelector('#res').value
-    if (clearAll) {
-      document.querySelector('#res').value = message
-    }
-    else {
-      document.querySelector('#res').value = preValue + message + "\n"
-    }
 
-    var textarea = document.querySelector('#res');
-    textarea.scrollTop = textarea.scrollHeight;
+  document.onkeydown = (e) => {
+    // 兼容FF和IE和Opera  
+    var theEvent = e || window.event;
+    var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+    if (code == 13) {
+      search()
+      return false;
+    }
+    return true;
   }
 
-  document.onkeydown=(e)=> {  
-        // 兼容FF和IE和Opera  
-        var theEvent = e || window.event;  
-        var code = theEvent.keyCode || theEvent.which || theEvent.charCode;  
-        if (code == 13) {  
-          search()
-            return false;  
-        }  
-        return true;  
-    }
+  const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
+    const { data } = await axios({
+      method: 'post',
+      url: '/user/downloadflag',
+      data: {
+        secUserId,
+        downloadFlag
+      }
+    }).then((res) => {
+    }).catch(res => {
+    }).finally((res) => {
+      search()
+    });
+  }
+
+  initGrid()
+  search()
+
 </script>
 
 </html>

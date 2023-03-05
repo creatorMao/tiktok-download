@@ -11,6 +11,7 @@ import { log, getLogData } from './Helper/logHelper.js'
 import { startTask } from './Service/task.js'
 import { getLatestTaskStatus } from './Service/taskStatus.js'
 import { startCronJob } from './Service/cronJob.js'
+import fs from 'fs'
 
 const initExpress = () => {
   const app = express()
@@ -58,11 +59,6 @@ const initExpress = () => {
 
   app.post('/user/search', async function (req, res) {
     const keyword = getParam(req, 'keyword')
-    if (!keyword) {
-      res.send(err('请填写keyword参数！'));
-      return
-    }
-
     res.send(Ok('', await getUserList(keyword)));
   })
 
@@ -92,6 +88,16 @@ const initExpress = () => {
 
   app.get('/task/status/latest', async function (req, res) {
     res.send(Ok('', await getLatestTaskStatus()))
+  })
+
+  app.get('/asset', async function (req, res) {
+    const url = getParam(req, 'url', false)
+    if (!url) {
+      res.send(err('url参数未填写！'))
+    }
+    fs.readFile(`${url}`, function (err, data) {
+      res.end(data)
+    })
   })
 
   app.listen(apiPort, () => {
