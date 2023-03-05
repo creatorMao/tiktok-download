@@ -13,12 +13,13 @@
 // import { getSecond, getNowDate } from './Helper/dateHelper.js'
 // console.log(getNowDate());
 
-// import { saveFile } from './Helper/fsHelper.js'
-// console.log(2);
-// const res = await saveFile('https://suitplay.net/wp-content/uploads/2022/06/00F144AC-46A6-4298-A2B7-92FF1741D9E3.jpeg', './Data/test', '1.mp4')
-// // const res = await saveFile('https1://t8.baidu.com/it/u=3616464563,3199287374&fm=217&app=125&size=f242,162&n=0&g=0n&f=JPEG?s=7FEAAB561F5F7CC80C490BFB0300903C&sec=1675929937&t=aafa7485378d4856ce31b0fcd97a1de0', './Data/test', '1.jpg')
-// console.log(res);
-// console.log(1);
+import { saveFile } from '../Helper/fsHelper.js'
+console.log(2);
+const res = await saveFile('http://localhost:3000/asset?url=./MS4wLjABAAAAvWBAHj1Y6X6C7oCmFp3CZXqXSVh_A0P4MrCh92u30cE/7157677576385793318-v0300fg10000cdaipf3c77u5oudp5d8g.mp4', './Data/test', '1.mp4')
+// const res = await saveFile('http://localhost:3000/asset?url=./data/MS4wLjABAAAAvWBAHj1Y6X6C7oCmFp3CZXqXSVh_A0P4MrCh92u30cE/11.txt', './Data/test', '1.txt')
+// const res = await saveFile('https1://t8.baidu.com/it/u=3616464563,3199287374&fm=217&app=125&size=f242,162&n=0&g=0n&f=JPEG?s=7FEAAB561F5F7CC80C490BFB0300903C&sec=1675929937&t=aafa7485378d4856ce31b0fcd97a1de0', './Data/test', '1.jpg')
+console.log(res);
+console.log(1);
 
 
 // import { addAweme } from './Service/aweme.js'
@@ -83,10 +84,10 @@
 // console.log(urlObj)
 // console.log(removeQueryParam(urlText));
 
-import { createCookieString } from '../Helper/generatorHelper.js'
+// import { createCookieString } from '../Helper/generatorHelper.js'
 
-console.log(createCookieString([
-  ['1', '2'],
-  ['4', '5'],
-  ['3', '4']
-]))
+// console.log(createCookieString([
+//   ['1', '2'],
+//   ['4', '5'],
+//   ['3', '4']
+// ]))
