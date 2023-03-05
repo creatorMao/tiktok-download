@@ -5,7 +5,7 @@ import { delay } from './dateHelper.js'
 
 const request = axios.create({ headers });
 
-const getParam = (req, key) => {
+const getParam = (req, key, isLog = true) => {
   let queryRes = "";
   let bodyRes = "";
 
@@ -18,7 +18,7 @@ const getParam = (req, key) => {
   }
 
   let res = queryRes || bodyRes || "";
-  log(`获取到参数:${key},参数值:${res}`)
+  if (isLog) { log(`获取到参数:${key},参数值:${res}`) }
   return res
 }
 
