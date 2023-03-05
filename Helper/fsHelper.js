@@ -69,6 +69,11 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
         },
       })
 
+      if (!response.data.buffer || response.data.buffer.byteLength === 0) {
+        log('疑似空文件');
+        throw Error('疑似空文件！')
+      }
+
       fs.writeFileSync(fileUrlAbs, response.data, 'binary')
 
       res.msg = "文件下载成功！"
