@@ -71,9 +71,11 @@ const initExpress = () => {
     res.send(Ok('日志获取成功~', getLogData(300).join('')))
   })
 
-  app.get('/task/start', async function (req, res) {
+  app.post('/task/start', async function (req, res) {
     const sort = getParam(req, 'sort')
-    startTask(undefined, sort)
+    const userList = getParam(req, 'userList')
+    const downloadType = getParam(req, 'downloadType')
+    startTask(undefined, sort, userList ? JSON.parse(userList) : userList, downloadType)
     res.send(Ok('已启动~'))
   })
 

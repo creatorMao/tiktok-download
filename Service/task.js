@@ -13,16 +13,22 @@ import { createGuid } from '../Helper/generatorHelper.js'
 import { getLatestTaskStatus, addTaskStatus } from './taskStatus.js'
 import { updateUserDownloadFlag } from '../Service/user.js'
 
-const startTask = async (restartLogFlag = false, sort = "desc") => {
+const startTask = async (restartLogFlag = false, sort = "desc", userListArg, downloadTypeArg) => {
   log(`当前下载队列为${sort == "asc" ? '正' : '倒'}序`)
   if (restartLogFlag) {
     restartLog()
   }
   await initDb(dbFilePath, sqlList);
 
-  let userList = (await getUserList()).filter((item) => {
-    return (item.DOWNLOAD_FLAG != '0')
-  });
+  let userList = []
+  if (userListArg) {
+    userList = userListArg
+  }
+  else {
+    userList = (await getUserList()).filter((item) => {
+      return (item.DOWNLOAD_FLAG != '0')
+    });
+  }
 
   if (sort == "asc") {
     userList = userList.reverse()
@@ -55,15 +61,21 @@ const startTask = async (restartLogFlag = false, sort = "desc") => {
     const awemeList = await getUserAwemeList(secUserId);
 
     let downloadType = downloadTypeOfAll
-    switch (user["DOWNLOAD_FLAG"] + "") {
-      case "1":
-        downloadType = downloadTypeOfAll
-        log('该用户进行全量下载');
-        break;
-      case "2":
-        downloadType = downloadTypeOfUpdate
-        log('该用户进行增量下载');
-        break;
+
+    if (downloadTypeArg) {
+      downloadType = downloadTypeArg
+    }
+    else {
+      switch (user["DOWNLOAD_FLAG"] + "") {
+        case "1":
+          downloadType = downloadTypeOfAll
+          log('该用户进行全量下载');
+          break;
+        case "2":
+          downloadType = downloadTypeOfUpdate
+          log('该用户进行增量下载');
+          break;
+      }
     }
 
     const status = await downloadUserPost(secUserId, undefined, undefined, undefined, downloadType);
