@@ -102,8 +102,41 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
   }
 }
 
+const getFileInfo = (pathArg) => {
+  const res = {
+    flag: true,
+    size: 0
+  }
+  try {
+    res.size = fs.statSync(path.join(rootPath, pathArg)).size
+  }
+  catch {
+    res.flag = false
+  }
+
+  return res
+}
+
+const getDirList = (pathArg, ignoreList) => {
+  const pathAbs = path.join(rootPath, pathArg)
+  return fs.readdirSync(pathAbs).filter(item => {
+    return fs.statSync(path.join(pathAbs, `./${item}`)).isDirectory()
+      && ignoreList.indexOf(item) == -1
+  })
+}
+
+const getFiles = (pathArg) => {
+  const pathAbs = path.join(rootPath, pathArg)
+  return fs.readdirSync(pathAbs).filter(item => {
+    return !fs.statSync(`${pathAbs}/${item}`).isDirectory()
+  })
+}
+
 export {
+  getFileInfo,
   rootPath,
   createDir,
-  saveFile
+  saveFile,
+  getDirList,
+  getFiles
 }
