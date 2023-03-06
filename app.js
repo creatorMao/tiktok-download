@@ -62,9 +62,17 @@ const initExpress = () => {
     log('请求到修改用户下载状态接口')
     const secUserId = getParam(req, 'secUserId')
     const downloadFlag = getParam(req, 'downloadFlag')
-    const { msg } = await updateUserDownloadFlag(secUserId, downloadFlag);
-    log(msg)
-    res.send(Ok(msg));
+    if (secUserId) {
+      const list = secUserId.split(',')
+      for (let index = 0; index < list.length; index++) {
+        await updateUserDownloadFlag(list[index], downloadFlag);
+      }
+    }
+    else {
+      await updateUserDownloadFlag('', downloadFlag)
+    }
+
+    res.send(Ok());
   })
 
   app.get('/log/latest', async function (req, res) {

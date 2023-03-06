@@ -10,7 +10,7 @@ const getUserList = async (searchKeyword) => {
   let param = {}
 
   if (searchKeyword) {
-    sql += ` where NICK_NAME LIKE $searchKeyword`;
+    sql += ` where (NICK_NAME LIKE $searchKeyword or SEC_USER_ID LIKE $searchKeyword)`;
     param['$searchKeyword'] = `%${searchKeyword}%`
   }
 

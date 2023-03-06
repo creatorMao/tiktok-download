@@ -22,7 +22,7 @@
       padding: 0;
     }
 
-    #res{
+    #res {
       font-size: 15px;
     }
 
@@ -59,12 +59,12 @@
 
     .left {
       width: 40%;
-      border-right:1px solid rgba(0,0,0,0.1);
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
       padding: 10px;
       box-sizing: border-box;
     }
 
-    .button{
+    .button {
       margin-top: 10px;
     }
 
@@ -136,14 +136,14 @@
       </div>
       <div class="right">
         <div class="button">
-          功能4-设置所有用户的下载方式
-          <button onclick="updateUserDownloadFlag('','0')">都不下载</button>
+          功能4-设置勾选用户的下载方式
+          <button onclick="updateUserDownloadFlag('','0')">不下载</button>
           <button onclick="updateUserDownloadFlag('','2')">增量下载</button>
           <button onclick="updateUserDownloadFlag('','1')">全量下载</button>
         </div>
         <div class="button">
           功能5-搜索
-          <input id="searchText" placeholder="请输入用户昵称后，按回车"></input>
+          <input id="searchText" placeholder="昵称/ID，按回车"></input>
           <button onclick="search()" id="search">搜索</button>
         </div>
       </div>
@@ -166,10 +166,15 @@
   const initGrid = () => {
     $('#grid').datagrid({
       title: '已添加用户列表',
-      singleSelect: true,
+      // singleSelect:true,
+      // multiSort: true,
+      remoteSort: false,
       nowrap: false,
       columns: [[
         { field: 'RN', title: '序号', width: '50px', align: 'center' },
+        {
+          field: 'RN1', title: '', width: '50px', align: 'center', checkbox: true
+        },
         // { field: 'ID', title: '数据记录ID', width: '10%', align: 'center' },
         { field: 'SEC_USER_ID', title: '官方用户ID', width: '20%', align: 'center' },
         {
@@ -178,12 +183,12 @@
           }
         },
         {
-          field: 'USER_PIC', title: '头像', width: '10%', align: 'center', formatter: function (value, row, index) {
+          field: 'USER_PIC', title: '头像',sortable: true,  width: '10%', align: 'center', formatter: function (value, row, index) {
             return `<img style='width:50px;height:50px;border-radius:50%' src='./asset?url=${value}'>`
           }
         },
         {
-          field: 'DOWNLOAD_FLAG', title: '下载模式', width: '10%', align: 'center', formatter: function (value, row, index) {
+          field: 'DOWNLOAD_FLAG', sortable: true, title: '下载模式', width: '10%', align: 'center', formatter: function (value, row, index) {
             let res = ''
             switch (value + '') {
               case '0':
@@ -197,28 +202,36 @@
                 break;
             }
             return res
-          }
+          },
+          // sorter: function (a, b) {
+          //   console.log(a, b);
+          //   return a - b
+          // }
         },
         // { field: 'IMP_DATE', title: '插入日期', width: '10%', align: 'center' },
-        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center' },
-        { field: '11', title: '单个用户操作', width: '25%', align: 'center', formatter: function (value, row, index) {
-            return `<button onClick='onClickFullDownload(${index})'>全量下载</button>`
-          }},
+        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center',sortable: true, },
+        {
+          field: '11', title: '单个用户操作', width: '20%', align: 'center', formatter: function (value, row, index) {
+            let buttonList = ''
+            buttonList += `<button onClick='onClickFullDownload(${index})'>全量下载</button>`
+            return buttonList
+          }
+        },
       ]]
     });
 
     $('#pagination').pagination({
-      pageList: [5,10, 15],
-      pageSize:5,
+      pageList: [5, 10, 15, 5000],
+      pageSize: 5,
       layout: ['list', 'first', 'prev', 'manual', 'next', 'last', 'info'],
       displayMsg: '当前无数据',
       onSelectPage: function (pageNumber, pageSize) {
-        console.log(pageNumber, pageSize);
-        console.log(window.gvData);
+        // console.log(pageNumber, pageSize);
+        // console.log(window.gvData);
         pageNumber--
         let start = pageSize * pageNumber
         let end = pageSize + pageSize * pageNumber
-        console.log(start, end);
+        // console.log(start, end);
         $('#grid').datagrid('loadData', window.gvData.slice(start, end).map((item, index) => {
           return {
             ...item,
@@ -254,9 +267,9 @@
     $('#grid').datagrid('loaded')
   }
 
-  const onClickFullDownload=(index)=>{
-    const row=$('#grid').datagrid('getData').rows[index]
-    startUpdate('asc',[row],'all')
+  const onClickFullDownload = (index) => {
+    const row = $('#grid').datagrid('getData').rows[index]
+    startUpdate('asc', [row], 'all')
   }
 
   const search = () => {
@@ -282,11 +295,11 @@
     var theEvent = e || window.event;
     var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
     if (code == 13) {
-      if(document.querySelector('#searchText').value){
+      if (document.querySelector('#searchText').value) {
         search()
       }
 
-      if(document.querySelector('#text').value){
+      if (document.querySelector('#text').value) {
         add()
       }
       return false;
@@ -295,7 +308,24 @@
   }
 
   const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
-    const { data } = await axios({
+    let checkedRows=$('#grid').datagrid('getChecked');
+    let nickName=''
+    if(checkedRows.length>0){
+      secUserId=checkedRows.map((item)=>{
+        return item['SEC_USER_ID']
+      }).join(',')
+      nickName=checkedRows.map((item)=>{
+        return item['NICK_NAME']
+      }).join('\n')
+    }
+
+    const flag=confirm(secUserId?`你选的是\n\n${nickName}\n\n是否继续？`:'你未选择，默认全部，\n是否继续？')
+
+    if(!flag){
+      return
+    }
+    
+    await axios({
       method: 'post',
       url: '/user/downloadflag',
       data: {
@@ -366,7 +396,8 @@
     }).catch(res => {
       const { msg = "" } = res.data
     }).finally((res) => {
-      document.querySelector('#text').value=''
+      document.querySelector('#text').value = ''
+      search()
     });
   }
 
@@ -383,16 +414,16 @@
     }
   }
 
-  const startUpdate = async (sort,userList,downloadType) => {
+  const startUpdate = async (sort, userList, downloadType) => {
     resetMessage();
 
     try {
       const msg = await axios({
         method: 'post',
         url: `/task/start`,
-        data:{
-          sort:`${sort}`,
-          userList:JSON.stringify(userList),
+        data: {
+          sort: `${sort}`,
+          userList: JSON.stringify(userList),
           downloadType
         }
       }).then((res) => {
