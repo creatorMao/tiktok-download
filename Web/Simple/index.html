@@ -179,12 +179,12 @@
         { field: 'SEC_USER_ID', title: '官方用户ID', width: '20%', align: 'center' },
         {
           field: 'NICK_NAME', title: '昵称', width: '15%', align: 'center', formatter: function (value, row, index) {
-            return value ? `<a href='${row['HOME_SHORT_URL']}' target='_blank'>${value}</a>` : row['HOME_SHORT_URL']
+            return `<a href='/user?secUserId=${row['SEC_USER_ID']}'>${value}</a>` 
           }
         },
         {
           field: 'USER_PIC', title: '头像',sortable: true,  width: '10%', align: 'center', formatter: function (value, row, index) {
-            return `<img style='width:50px;height:50px;border-radius:50%' src='./asset?url=${value}'>`
+            return `<a href='${row['HOME_SHORT_URL']}' target='_blank'><img style='width:50px;height:50px;border-radius:50%' src='./asset?url=${value}'></a>`
           }
         },
         {

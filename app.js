@@ -40,6 +40,14 @@ const initExpress = () => {
     res.sendFile(path.join(rootPath, './Web/Simple/index.html'))
   })
 
+  app.get('/user', async function (req, res) {
+    const secUserId = getParam(req, 'secUserId')
+    res.set('Content-Type', 'text/html');
+    let content = fs.readFileSync(path.join(rootPath, `./Web/Simple/user.html`)).toString()
+    content = content.replaceAll(`window.secUserId=''`, `window.secUserId='${secUserId}'`);
+    res.send(Buffer.from(content));
+  })
+
   app.post('/user/add', async function (req, res) {
     const url = getParam(req, 'url')
     log(`获取到url参数：${url}`)
