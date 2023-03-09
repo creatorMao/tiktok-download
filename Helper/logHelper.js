@@ -17,11 +17,19 @@ const restartLog = (fileName = getNowDate('YYYY-MM-DD-HH-mm-ss')) => {
   logData = []
 }
 
+const logLevelConst = {
+  errorLevel: 'error',
+  infoLevel: 'info'
+}
+
 const getLogLevelText = (logLevel) => {
   let res = "";
   switch (logLevel) {
-    case "error":
+    case logLevelConst.errorLevel:
       res = "异常"
+      break;
+    case logLevelConst.infoLevel:
+      res = "日志"
       break;
     default:
       res = "日志"
@@ -30,7 +38,7 @@ const getLogLevelText = (logLevel) => {
   return res
 }
 
-const log = (logText, logLevel) => {
+const log = (logText, logLevel = logLevelConst.infoLevel) => {
   if (logText) {
     if (!currentLogFileName) {
       restartLog();
@@ -42,25 +50,33 @@ const log = (logText, logLevel) => {
     logText += "\n"
     fs.appendFileSync(path.join(currentLogPath, "/" + currentLogFileName), logText, 'utf8');
 
-    logData.push(logText)
+    logData.push({
+      logLevel,
+      logText
+    })
   }
 }
 
-const logLevel = {
-  errorLevel: 'error'
-}
+const getLogData = (countLimit, logLevel = logLevelConst.infoLevel) => {
+  let resRaw = logData
 
-const getLogData = (countLimit) => {
+  if (logLevel == logLevelConst.errorLevel) {
+    resRaw = resRaw.filter((item) => {
+      return item.logLevel == logLevelConst.errorLevel
+    })
+  }
+
   if (countLimit) {
-    let logLength = logData.length
+    let logLength = resRaw.length
     if (logLength < countLimit) {
-      return logData
+      return resRaw
     }
     else {
-      return logData.slice(logLength - countLimit)
+      return resRaw.slice(logLength - countLimit)
     }
   }
-  return logData
+
+  return resRaw
 }
 
 export {
@@ -68,5 +84,5 @@ export {
   logData,
   restartLog,
   log,
-  logLevel
+  logLevelConst as logLevel
 }

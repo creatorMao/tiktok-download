@@ -133,6 +133,13 @@
           <button onclick="startUpdate('desc')">列表倒序</button>
           <button onclick="startUpdate('asc')">列表正序</button>
         </div>
+        <div class="button">
+          功能4-过滤日志
+          <select id="logSelect" onchange="selectLog()">
+            <option value="">最新300条&全部格式</option>
+            <option value="error">最新300条&异常</option>
+         </select>
+        </div>
       </div>
       <div class="right">
         <div class="button">
@@ -243,6 +250,10 @@
 
       }
     });
+  }
+
+  const selectLog=()=>{
+    getServerLog()
   }
 
   const loadData = (data) => {
@@ -358,10 +369,18 @@
 
   let timer = undefined
   const getServerLog = async () => {
+
+    const logLevel=document.getElementById('logSelect').value
+
+    clearInterval(timer)
+
     timer = setInterval(async () => {
       const { data } = await axios({
-        method: 'get',
+        method: 'post',
         url: '/log/latest',
+        data:{
+          logLevel
+        }
       }).then((res) => {
         return res.data
       }).catch(res => {
