@@ -129,12 +129,7 @@
           <button onclick="closeServer()">强制停止服务</button>
         </div>
         <div class="button">
-          功能3-启动下载
-          <button onclick="startUpdate('desc')">列表倒序</button>
-          <button onclick="startUpdate('asc')">列表正序</button>
-        </div>
-        <div class="button">
-          功能4-过滤日志
+          功能3-过滤日志
           <select id="logSelect" onchange="selectLog()">
             <option value="">最新300条&全部格式</option>
             <option value="error">最新300条&异常</option>
@@ -149,7 +144,12 @@
           <button onclick="updateUserDownloadFlag('','1')">全量下载</button>
         </div>
         <div class="button">
-          功能5-搜索
+          功能5-勾选的用户启动下载
+          <button onclick="startUpdate('desc')">列表倒序</button>
+          <button onclick="startUpdate('asc')">列表正序</button>
+        </div>
+        <div class="button">
+          功能6-搜索
           <input id="searchText" placeholder="昵称/ID，按回车"></input>
           <button onclick="search()" id="search">搜索</button>
         </div>
@@ -183,7 +183,7 @@
           field: 'RN1', title: '', width: '50px', align: 'center', checkbox: true
         },
         // { field: 'ID', title: '数据记录ID', width: '10%', align: 'center' },
-        { field: 'SEC_USER_ID', title: '官方用户ID', width: '20%', align: 'center' },
+        { field: 'SEC_USER_ID', title: '官方用户ID', width: '30%', align: 'center' },
         {
           field: 'NICK_NAME', title: '昵称', width: '15%', align: 'center', formatter: function (value, row, index) {
             return `<a href='/user?secUserId=${row['SEC_USER_ID']}'>${value}</a>` 
@@ -216,14 +216,14 @@
           // }
         },
         // { field: 'IMP_DATE', title: '插入日期', width: '10%', align: 'center' },
-        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center',sortable: true, },
-        {
-          field: '11', title: '单个用户操作', width: '20%', align: 'center', formatter: function (value, row, index) {
-            let buttonList = ''
-            buttonList += `<button onClick='onClickFullDownload(${index})'>全量下载</button>`
-            return buttonList
-          }
-        },
+        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center',sortable: true, }//,
+        // {
+        //   field: '11', title: '单个用户操作', width: '20%', align: 'center', formatter: function (value, row, index) {
+        //     let buttonList = ''
+        //     buttonList += `<button onClick='onClickFullDownload(${index})'>全量下载</button>`
+        //     return buttonList
+        //   }
+        // },
       ]]
     });
 
@@ -279,8 +279,7 @@
   }
 
   const onClickFullDownload = (index) => {
-    const row = $('#grid').datagrid('getData').rows[index]
-    startUpdate('asc', [row], 'all')
+    
   }
 
   const search = () => {
@@ -434,15 +433,21 @@
   }
 
   const startUpdate = async (sort, userList, downloadType) => {
-    resetMessage();
+    const row = $('#grid').datagrid('getChecked')
 
+    const flag=confirm('当前未选择用户，将下载所有用户')
+
+    if(!flag){
+      return 
+    }
+    resetMessage();
     try {
       const msg = await axios({
         method: 'post',
         url: `/task/start`,
         data: {
           sort: `${sort}`,
-          userList: JSON.stringify(userList),
+          userList: row.length>0?JSON.stringify(row):undefined,
           downloadType
         }
       }).then((res) => {
