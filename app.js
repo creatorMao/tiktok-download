@@ -86,9 +86,7 @@ const initExpress = () => {
   app.all('/log/latest', async function (req, res) {
     const logLevel = getParam(req, 'logLevel', false)
     const countLimit = getParam(req, 'countLimit', false)
-    res.send(Ok('日志获取成功~', getLogData(countLimit || 300, logLevel).map((item) => {
-      return item.logText
-    }).join('')))
+    res.send(Ok('日志获取成功~', getLogData(countLimit || 300, logLevel).join('')))
   })
 
   app.post('/task/start', async function (req, res) {
