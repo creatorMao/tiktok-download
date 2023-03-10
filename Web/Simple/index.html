@@ -434,12 +434,17 @@
 
   const startUpdate = async (sort, userList, downloadType) => {
     const row = $('#grid').datagrid('getChecked')
-
-    const flag=confirm('当前未选择用户，将下载所有用户')
+    
+    const flag= true;
+    
+    if(row.length==0){
+      flag=confirm('当前未选择用户，将下载所有用户')
+    }
 
     if(!flag){
       return 
     }
+    
     resetMessage();
     try {
       const msg = await axios({
