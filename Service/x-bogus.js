@@ -1,6 +1,9 @@
 import MD5 from 'md5'
 import { log, logLevel } from '../Helper/logHelper.js'
 
+//该逻辑来源于https://github.com/Johnserf-Seed/TikTokDownload/blob/main/Util/x-bogus.js
+//请支持原作者项目，给予star,白嫖可耻！！
+
 let Array = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 10, 11, 12, 13, 14, 15];
 
 // let _0x4129ad = 'Dkdpgh4ZKsQB80/Mfvw36XI1R25+WUAlEi7NLboqYTOPuzmFjJnryx9HVGcaStCe';
