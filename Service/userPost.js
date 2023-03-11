@@ -5,7 +5,7 @@ const { errorLevel } = logLevel
 import { saveFile } from '../Helper/fsHelper.js'
 import { retryCount, delayTimeOut, checkDownloadCount } from '../Config/config.js'
 import { calcSecondDifference, delay } from '../Helper/dateHelper.js'
-import { getXg } from './xg.js'
+import { getXB } from './x-bogus.js'
 import { dataPath } from '../Config/config.js'
 import {
   aweme,
@@ -19,17 +19,17 @@ import {
 import { addAweme } from './aweme.js'
 
 const createApi = async (type, param) => {
-  await delay(delayTimeOut, '正在创建url，涉及xg参数')
+  await delay(delayTimeOut, '正在创建url，涉及xb参数')
   let api = "";
   let paramText = "";
-  let xg = ""
+  let xb = ""
   switch (type) {
     case aweme: //作品集
       const { secUserId, onePageCount, cursor } = param
       paramText = `aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&sec_user_id=${secUserId}&count=${onePageCount}&max_cursor=${cursor}`
-      xg = await getXg(paramText)
+      xb = getXB(paramText)
       api = `https://www.douyin.com/aweme/v1/web/aweme/post/?${paramText}`
-      api = `${api}&X-Bogus=${xg}`
+      api = `${api}&X-Bogus=${xb}`
       break;
     case videoType: //视频
       const { videoUri } = param
@@ -38,9 +38,9 @@ const createApi = async (type, param) => {
     case awemeDetail://作品详情
       const { aweme_id } = param
       paramText = `aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&aweme_id=${aweme_id}`
-      xg = await getXg(paramText)
+      xb = getXB(paramText)
       api = `https://www.douyin.com/aweme/v1/web/aweme/detail/?${paramText}`
-      api = `${api}&X-Bogus=${xg}`
+      api = `${api}&X-Bogus=${xb}`
       break;
     case awemeAvatar://作者头像
       const { fileUri } = param
@@ -49,7 +49,7 @@ const createApi = async (type, param) => {
   }
 
   return {
-    xg,
+    xb,
     api
   };
 }
@@ -86,10 +86,10 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
 
   let downloadedCount = 1
 
-  const { api, xg } = await createApi(aweme, { secUserId, onePageCount: 35, cursor })
+  const { api, xb } = await createApi(aweme, { secUserId, onePageCount: 35, cursor })
 
-  if (!xg) {
-    log('未获取到xg参数，将跳过当前用户~');
+  if (!xb) {
+    log('未获取到xb参数，将跳过当前用户~');
     return downloadStatus
   }
 
