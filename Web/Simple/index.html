@@ -435,7 +435,7 @@
   const startUpdate = async (sort, userList, downloadType) => {
     const row = $('#grid').datagrid('getChecked')
     
-    const flag= true;
+    let flag= true;
     
     if(row.length==0){
       flag=confirm('当前未选择用户，将下载所有用户')
