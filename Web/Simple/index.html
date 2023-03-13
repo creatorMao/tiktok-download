@@ -133,7 +133,11 @@
           <select id="logSelect" onchange="selectLog()">
             <option value="">最新300条&全部格式</option>
             <option value="error">最新300条&异常</option>
-         </select>
+          </select>
+          <div class="button">
+            功能7-日志路径
+            <p style="margin-top: 10px" id="logFileUrl"></p>
+          </div>
         </div>
       </div>
       <div class="right">
@@ -186,11 +190,11 @@
         { field: 'SEC_USER_ID', title: '官方用户ID', width: '30%', align: 'center' },
         {
           field: 'NICK_NAME', title: '昵称', width: '15%', align: 'center', formatter: function (value, row, index) {
-            return `<a href='/user?secUserId=${row['SEC_USER_ID']}'>${value}</a>` 
+            return `<a href='/user?secUserId=${row['SEC_USER_ID']}'>${value}</a>`
           }
         },
         {
-          field: 'USER_PIC', title: '头像',sortable: true,  width: '10%', align: 'center', formatter: function (value, row, index) {
+          field: 'USER_PIC', title: '头像', sortable: true, width: '10%', align: 'center', formatter: function (value, row, index) {
             return `<a href='${row['HOME_SHORT_URL']}' target='_blank'><img style='width:50px;height:50px;border-radius:50%' src='./asset?url=${value}'></a>`
           }
         },
@@ -216,7 +220,7 @@
           // }
         },
         // { field: 'IMP_DATE', title: '插入日期', width: '10%', align: 'center' },
-        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center',sortable: true, }//,
+        { field: 'IMP_TIME', title: '插入时间', width: '20%', align: 'center', sortable: true, }//,
         // {
         //   field: '11', title: '单个用户操作', width: '20%', align: 'center', formatter: function (value, row, index) {
         //     let buttonList = ''
@@ -252,7 +256,7 @@
     });
   }
 
-  const selectLog=()=>{
+  const selectLog = () => {
     getServerLog()
   }
 
@@ -279,7 +283,7 @@
   }
 
   const onClickFullDownload = (index) => {
-    
+
   }
 
   const search = () => {
@@ -318,23 +322,23 @@
   }
 
   const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
-    let checkedRows=$('#grid').datagrid('getChecked');
-    let nickName=''
-    if(checkedRows.length>0){
-      secUserId=checkedRows.map((item)=>{
+    let checkedRows = $('#grid').datagrid('getChecked');
+    let nickName = ''
+    if (checkedRows.length > 0) {
+      secUserId = checkedRows.map((item) => {
         return item['SEC_USER_ID']
       }).join(',')
-      nickName=checkedRows.map((item)=>{
+      nickName = checkedRows.map((item) => {
         return item['NICK_NAME']
       }).join('\n')
     }
 
-    const flag=confirm(secUserId?`你选的是\n\n${nickName}\n\n是否继续？`:'你未选择，默认全部，\n是否继续？')
+    const flag = confirm(secUserId ? `你选的是\n\n${nickName}\n\n是否继续？` : '你未选择，默认全部，\n是否继续？')
 
-    if(!flag){
+    if (!flag) {
       return
     }
-    
+
     await axios({
       method: 'post',
       url: '/user/downloadflag',
@@ -369,7 +373,7 @@
   let timer = undefined
   const getServerLog = async () => {
 
-    const logLevel=document.getElementById('logSelect').value
+    const logLevel = document.getElementById('logSelect').value
 
     clearInterval(timer)
 
@@ -377,7 +381,7 @@
       const { data } = await axios({
         method: 'post',
         url: '/log/latest',
-        data:{
+        data: {
           logLevel
         }
       }).then((res) => {
@@ -387,7 +391,8 @@
       }).finally((res) => {
       });
 
-      printMessage(data, true)
+      printMessage(data.logData.join(''), true)
+      document.getElementById('logFileUrl').innerHTML = data.filePath
     }, 2000)
   }
 
@@ -434,17 +439,17 @@
 
   const startUpdate = async (sort, userList, downloadType) => {
     const row = $('#grid').datagrid('getChecked')
-    
-    let flag= true;
-    
-    if(row.length==0){
-      flag=confirm('当前未选择用户，将下载所有用户')
+
+    let flag = true;
+
+    if (row.length == 0) {
+      flag = confirm('当前未选择用户，将下载所有用户')
     }
 
-    if(!flag){
-      return 
+    if (!flag) {
+      return
     }
-    
+
     resetMessage();
     try {
       const msg = await axios({
@@ -452,7 +457,7 @@
         url: `/task/start`,
         data: {
           sort: `${sort}`,
-          userList: row.length>0?JSON.stringify(row):undefined,
+          userList: row.length > 0 ? JSON.stringify(row) : undefined,
           downloadType
         }
       }).then((res) => {

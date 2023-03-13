@@ -71,15 +71,15 @@ const getLogData = (countLimit, logLevel = logLevelConst.infoLevel) => {
 
   if (countLimit) {
     let logLength = resRaw.length
-    if (logLength < countLimit) {
-      return resRaw
-    }
-    else {
-      return resRaw.slice(logLength - countLimit)
+    if (logLength > countLimit) {
+      resRaw = resRaw.slice(logLength - countLimit)
     }
   }
 
-  return resRaw
+  return {
+    filePath: `${currentLogPath}/${currentLogFileName}`,
+    logData: resRaw
+  }
 }
 
 export {
