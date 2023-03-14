@@ -13,7 +13,7 @@
   <style>
     #text {
       width: 100%;
-      height: 7vh;
+      height: 15vh;
       margin-top: 10px;
     }
 
@@ -117,7 +117,7 @@
   <div class="container">
     <div class="top">
       <div class="left">
-        <textarea id="text" name="" rows="10" placeholder="复制用户主页短链/长链到此输入框后按回车键,是主页链接！！！！！不是视频链接！！！！"></textarea>
+        <textarea id="text"  name="" rows="20" placeholder="复制用户主页短链/长链到此输入框。是主页链接！！！！！不是视频链接！！！！支持批量（请换行）"></textarea>
         <div class="button">
           功能1-将上方输入框里的用户添加到下载队列
           <button onclick="reset()" id="reset">清空输入框</button>
@@ -313,10 +313,10 @@
         search()
       }
 
-      if (document.querySelector('#text').value) {
-        add()
-      }
-      return false;
+      // if (document.querySelector('#text').value) {
+      //   add()
+      // }
+      return true;
     }
     return true;
   }
@@ -411,7 +411,7 @@
     axios({
       method: 'post',
       url: '/user/add',
-      params: {
+      data: {
         url,
       }
     }).then((res) => {
@@ -493,7 +493,7 @@
   const filterUrl = (text) => {
     try {
       if (text) {
-        return text.match(new RegExp(/((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g))[0];
+        return text.match(new RegExp(/((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g)).join('\n');
       }
     }
     catch {

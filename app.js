@@ -56,13 +56,17 @@ const initExpress = () => {
       return
     }
 
-    const { msg } = await addUser(url);
-    log(msg)
-    res.send(Ok(msg));
+    const urlList = url.split('\n')
+    log(`根据回车分割出${urlList.length}个用户链接`)
+    for (let i = 0; i < urlList.length; i++) {
+      const { msg } = await addUser(urlList[i]);
+      log(msg)
+    }
+    res.send(Ok());
   })
 
   app.post('/user/search', async function (req, res) {
-    const keyword = getParam(req, 'keyword')
+    const keyword = getParam(req, 'keyword', false)
     res.send(Ok('', await getUserList(keyword)));
   })
 
