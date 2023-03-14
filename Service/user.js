@@ -55,7 +55,7 @@ const addUser = async (url) => {
   const userDetail = await getUserDetail(secUserId)
   if (userDetail.length > 0) {
     return {
-      msg: '该用户已存在，无需重新添加',
+      msg: `该用户 ${userDetail[0]['NICK_NAME']} 已存在，无需重新添加`,
       flag: false
     }
   }
