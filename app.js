@@ -1,7 +1,7 @@
 import express from 'express'
 import { apiPort, dbFilePath, dataPath } from './Config/config.js'
 import { getParam } from './Helper/httpHelper.js'
-import { addUser, updateUserDownloadFlag, getUserList } from './Service/user.js'
+import { addUser, updateUserDownloadFlag, getUserList, deleteUser } from './Service/user.js'
 import { err, Ok } from './Helper/returnHelper.js'
 import { initDb } from './Helper/dbHelper.js'
 import { sqlList } from './Config/sql.js'
@@ -63,6 +63,17 @@ const initExpress = () => {
       log(msg)
     }
     res.send(Ok());
+  })
+
+  app.post('/user/delete', async function (req, res) {
+    const secUserId = getParam(req, 'secUserId')
+    if (!secUserId) {
+      res.send(err('请填写secUserId参数！'));
+      return
+    }
+    const { msg } = await deleteUser(secUserId);
+
+    res.send(Ok(msg));
   })
 
   app.post('/user/search', async function (req, res) {

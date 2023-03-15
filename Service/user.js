@@ -29,14 +29,14 @@ const getUserDetail = async (secUserId) => {
 
 const getSecUserIdFromUrl = async (url) => {
   url = removeQueryParam(url)
-  log(`链接去除掉查询参数后:为【${url}】`);
+  //log(`链接去除掉查询参数后:为【${url}】`);
   let secUserId = ""
   if (url.indexOf(homeUrlPrefix) != "-1") {
-    log('该链接属于长链~');
+    //log('该链接属于长链~');
     secUserId = url.replaceAll(homeUrlPrefix, '')
   }
   else {
-    log('该链接属于短链~');
+    //log('该链接属于短链~');
     secUserId = await getSecUserIdFromShortUrl(url);
   }
   log(`分析出secUserId为【${secUserId}】`);
@@ -64,7 +64,7 @@ const addUser = async (url) => {
 
     if (!nickName) {
       return {
-        msg: '用户可能为私密账户，无法获取用户昵称，添加用户失败',
+        msg: `该用户 ${nickName} 可能为私密账户，无法获取用户昵称，添加用户失败`,
         flag: false
       }
     }
@@ -84,6 +84,19 @@ const addUser = async (url) => {
       flag: true,
       msg: '用户添加成功！'
     }
+  }
+}
+
+const deleteUser = async (secUserId) => {
+  let sql = `DELETE FROM USER WHERE SEC_USER_ID=$SEC_USER_ID`
+
+  await runSql(sql, {
+    '$SEC_USER_ID': secUserId
+  });
+
+  return {
+    flag: true,
+    msg: '用户删除成功！'
   }
 }
 
@@ -113,5 +126,6 @@ const updateUserDownloadFlag = async (secUserId, downloadFlag) => {
 export {
   addUser,
   getUserList,
-  updateUserDownloadFlag
+  updateUserDownloadFlag,
+  deleteUser
 }
