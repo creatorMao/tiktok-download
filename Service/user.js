@@ -61,6 +61,14 @@ const addUser = async (url) => {
   }
   else {
     const { nickName, picPathFull } = await getUserInfo(secUserId);
+
+    if (!nickName) {
+      return {
+        msg: '用户可能为私密账户，无法获取用户昵称，添加用户失败',
+        flag: false
+      }
+    }
+
     let sql = `insert into USER(ID,HOME_SHORT_URL,SEC_USER_ID,NICK_NAME,USER_PIC)
               values($ID,$HOME_SHORT_URL,$SEC_USER_ID,$NICK_NAME,$USER_PIC)
     `
