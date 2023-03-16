@@ -139,6 +139,11 @@
             <p style="margin-top: 10px" id="logFileUrl"></p>
           </div>
         </div>
+        <div class="button">
+          功能8
+          <button onclick="stopServerLog()">停止刷新日志</button>
+          <button onclick="getServerLog()">继续刷新日志</button>
+        </div>
       </div>
       <div class="right">
         <div class="button">
@@ -381,12 +386,16 @@
     textarea.scrollTop = textarea.scrollHeight;
   }
 
+  const stopServerLog=()=>{
+    clearInterval(timer)
+  }
+
   let timer = undefined
   const getServerLog = async () => {
 
     const logLevel = document.getElementById('logSelect').value
 
-    clearInterval(timer)
+    stopServerLog()
 
     timer = setInterval(async () => {
       const { data } = await axios({
