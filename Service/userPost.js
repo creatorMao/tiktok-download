@@ -20,7 +20,7 @@ import { addAweme } from './aweme.js'
 
 const createApi = async (type, param) => {
   // await delay(delayTimeOut, '正在创建url，涉及xb参数')
-  log('正在创建url')
+  log('正在创建请求url')
   let api = "";
   let paramText = "";
   let xb = ""

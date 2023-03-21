@@ -32,7 +32,7 @@ const getXg = async (paramText) => {
 
   if (result.length > 0) {
     xg = result[0]["X-Bogus"]["0"]
-    log(`获取到xg:${xg}`);
+    //log(`获取到xg:${xg}`);
     count++
   }
 
