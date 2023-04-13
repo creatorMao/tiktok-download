@@ -32,10 +32,6 @@ const createApi = async (type, param) => {
       api = `https://www.douyin.com/aweme/v1/web/aweme/post/?${paramText}`
       api = `${api}&X-Bogus=${xb}`
       break;
-    case videoType: //视频
-      const { videoUri } = param
-      api = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${videoUri}&ratio=1080p&line=0`
-      break;
     case awemeDetail://作品详情
       const { aweme_id } = param
       paramText = `aid=1128&version_name=23.5.0&device_platform=android&os_version=2333&aweme_id=${aweme_id}`
@@ -139,16 +135,12 @@ const downloadUserPost = async (secUserId, cursor = 0, currentRetryCount = 0, st
         awemeType = picture
         downloadRes = await downloadPicture(secUserId, aweme_id, path)
         break;
-      // case "0":
-      //   log(`${cursor}页，第${index + 1}个作品是视频，正在处理。`);
-      //   awemeType = videoType
-      //   downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
       default:
         //除了68，其他统一先按视频下载
         log(`${cursor}页，第${index + 1}个作品是的类型是${aweme_type},统一按视频处理~`);
         awemeType = videoType
         if (video && video.play_addr) {
-          downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, path);
+          downloadRes = await downloadVideo(secUserId, aweme_id, video.play_addr.uri, video.play_addr.url_list, path);
         }
         else {
           log(`该作品格式异常${JSON.stringify(awemeItem)}`, errorLevel)
@@ -343,10 +335,10 @@ const downloadPicture = async (secUserId, aweme_id, path) => {
 }
 
 
-const downloadVideo = async (secUserId, aweme_id, videoUri, path) => {
-  const { api } = await createApi(videoType, { videoUri });
+const downloadVideo = async (secUserId, aweme_id, videoUri, videoUrl, path) => {
   const fileName = aweme_id + "-" + videoUri.replaceAll('/', '-') + ".mp4"
-  const res = await saveFile(api, path, fileName)
+  console.log(videoUrl);
+  const res = await saveFile(videoUrl[videoUrl.length - 1], path, fileName)
   return [{
     ...res,
     aweme_id

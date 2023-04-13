@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import axios from 'axios'
+import { request } from './httpHelper.js'
 import { retryCount, delayTimeOut } from '../Config/config.js'
 import { fileURLToPath } from 'url'
 import { log } from './logHelper.js'
@@ -56,7 +56,7 @@ const saveFile = async (url, filePath, fileName, retryFlag = true, retryCountTot
       createDir(path.join(rootPath, filePath))
 
       log('正在下载文件~');
-      const response = await axios({
+      const response = await request({
         url,
         method: 'GET',
         timeout: 1000 * 60 * 10 * 2, //20分钟下载不下来，不下了~
